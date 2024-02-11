@@ -1,4 +1,4 @@
-# Profiler Builder
+# Convivial Profiler Builder
 
 The Profiler Builder is a web application designed for creating, managing, and exporting profiler configurations. It allows users to dynamically build profiler setups by specifying sources, processors, and destinations, and then export these configurations as JSON. Additionally, it provides functionality to import profiler configurations and visualize them in a tree structure for easy inspection.
 
