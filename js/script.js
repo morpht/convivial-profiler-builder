@@ -4,21 +4,20 @@ const defaultUrls = {
   destinations: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_destination.yml'
 };
 
-let urls = { ...defaultUrls }; // Copy default URLs
+let urls = { ...defaultUrls };
 
 document.getElementById('clearProfilersData').addEventListener('click', function () {
   localStorage.removeItem('profilersData');
   alert('Profilers data cleared from local storage.');
+  updateTextareaContent();
+  buildTreeFromLocalStorage();
 
-  // Optionally, refresh the page or UI to reflect the changes
-  location.reload(); // Use with caution; this will reload the page
-  // OR you might want to just clear the UI elements related to the profilersData without reloading the page.
+  location.reload();
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Load stored configuration on page load
   loadConfiguration();
-  populateProfilersFromLocalStorage(); // New function to populate the form
+  populateProfilersFromLocalStorage();
 
   document.getElementById('configForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -30,8 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     localStorage.setItem('profiler_settings', JSON.stringify(profilerSettings));
-
-    // Optionally, refresh the application state to use the new URLs
     updateFetchURLs();
   });
 
@@ -57,7 +54,6 @@ function updateFetchURLs() {
 document.getElementById('addProfiler').addEventListener('click', addProfiler);
 
 async function fetchYAMLData(category) {
-  // Load settings from localStorage, fallback to defaultUrls if not set
   const settings = JSON.parse(localStorage.getItem('profiler_settings')) || {};
   const url = settings[category] || defaultUrls[category];
 
@@ -139,6 +135,9 @@ async function addProfiler() {
   propertiesCell.innerHTML = `
           <div class="mb-2">
               <label>Label: <input type="text" class="form-control" name="label"></label>
+          </div>
+          <div class="mb-2">
+              <label>Machine Name: <input type="text" class="form-control" name="machine_name"></label>
           </div>
           <div class="mb-2">
               <label>Description: <textarea class="form-control" name="description"></textarea></label>
@@ -274,6 +273,7 @@ async function addProfilerForm(profiler) {
 
   // Populate the profiler form fields with saved data
   newRow.querySelector('[name="label"]').value = profiler.label || '';
+  newRow.querySelector('[name="machine_name"]').value = profiler.machine_name || '';
   newRow.querySelector('[name="description"]').value = profiler.description || '';
   newRow.querySelector('[name="deferred"]').checked = !!profiler.deferred;
   newRow.querySelector('[name="status"]').checked = !!profiler.status;
@@ -332,7 +332,11 @@ function saveOrUpdateProfilerData(rowNum) {
   }
 
   const labelValue = row.querySelector('input[name="label"]').value;
-  const machineName = generateMachineName(labelValue);
+  const machineName = row.querySelector('input[name="machine_name"]').value || generateMachineName(labelValue);
+
+  if (!machineName) {
+    return;
+  }
 
   const profilerData = {
     sources: captureCategoryConfig(row.cells[2]), // Assuming 3rd cell is for sources
