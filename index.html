@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Convivial Profiler Builder</title>
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+    </head>
+    <body>
+        <div class="m-4">
+            <h1>Convivial Profiler Builder 👷</h1>
+            <!-- Nav tabs -->
+            <ul class="mt-4 nav nav-tabs" id="tabMenu">
+                <li class="nav-item">
+                    <a class="nav-link active" id="ui-builder-tab" data-toggle="tab" href="#uiBuilder">🔧 UI Builder</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="export-tab" data-toggle="tab" href="#export">⬇️ Export</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="import-tab" data-toggle="tab" href="#import">⬆️ Import</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="inspector-tab" data-toggle="tab" href="#inspector">🔍 Inspector</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="documentation-tab" data-toggle="tab" href="#documentation">🕮 Documentation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="configuration-tab" data-toggle="tab" href="#configuration">⚙️ Configuration</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="uiBuilder" role="tabpanel" aria-labelledby="ui-builder-tab">
+                    <!-- Existing UI Builder Content Here -->
+                    <div class="mt-4">
+                        <button id="addProfiler" class="btn btn-primary mb-3">Add Profiler</button>
+                        <button onclick="downloadJSON()" class="btn btn-success mb-3">Download JSON</button>
+                        <button id="clearProfilersData" class="btn btn-danger mb-3">Clear Profilers Data</button>
+                        <table class="table table-striped" id="profilersTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Properties</th>
+                                    <th scope="col">Source(s)</th>
+                                    <th scope="col">Processor(s)</th>
+                                    <th scope="col">Destination(s)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Profilers will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
+                    <textarea id="jsonOutput" class="form-control mt-4" style="height: 500px;"></textarea>
+                    <button onclick="downloadJSON()" class="btn btn-success mt-3">Export JSON</button>
+                </div>
+
+                <div class="tab-pane fade" id="import" role="tabpanel" aria-labelledby="import-tab">
+                    <textarea id="jsonInput" class="form-control mt-4" style="height: 500px;"></textarea>
+                    <button onclick="importJSON()" class="btn btn-success mt-3">Import JSON</button>
+                </div>
+
+                <div class="tab-pane fade" id="inspector" role="tabpanel" aria-labelledby="inspector-tab">
+                    <div class="mt-4">
+                        <h2>Inspector</h2>
+                        <div id="profilersTree"></div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="documentation" role="tabpanel" aria-labelledby="documentation-tab">
+                    <div class="mt-4">
+                        <h2>Documentation</h2>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="configuration" role="tabpanel" aria-labelledby="configuration-tab">
+                    <form id="configForm" class="mt-4">
+                        <div class="form-group">
+                            <label for="sourceUrl">Source URL</label>
+                            <input type="text" class="form-control" id="sourceUrl" placeholder="Enter source URL">
+                        </div>
+                        <div class="form-group">
+                            <label for="processorUrl">Processor URL</label>
+                            <input type="text" class="form-control" id="processorUrl" placeholder="Enter processor URL">
+                        </div>
+                        <div class="form-group">
+                            <label for="destinationUrl">Destination URL</label>
+                            <input type="text" class="form-control" id="destinationUrl" placeholder="Enter destination URL">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- JS scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.0.0/js-yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="js/script.js"></script> <!-- Custom script -->
+    </body>
+
+</html>
