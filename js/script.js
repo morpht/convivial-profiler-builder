@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const profilerSettings = {
       sources: document.getElementById('sourceUrl').value || defaultUrls.sources,
       processors: document.getElementById('processorUrl').value || defaultUrls.processors,
-      destinations: document.getElementById('destinationUrl').value || defaultUrls.destinations
+      destinations: document.getElementById('destinationUrl').value || defaultUrls.destinations,
+      import_url: document.getElementById('importUrl').value
     };
 
     localStorage.setItem('profiler_settings', JSON.stringify(profilerSettings));
@@ -41,6 +42,7 @@ function loadConfiguration() {
     document.getElementById('sourceUrl').value = profilerSettings.sources || '';
     document.getElementById('processorUrl').value = profilerSettings.processors || '';
     document.getElementById('destinationUrl').value = profilerSettings.destinations || '';
+    document.getElementById('importUrl').value = profilerSettings.import_url || '';
   }
 }
 
@@ -80,20 +82,20 @@ async function createSelectBoxForCategory(category, cell) {
     cell.appendChild(selectFormContainer);
 
     let select = document.createElement('select');
-    select.className = 'form-control mb-2';
+    select.className = 'form-control mb-2 mt-2';
     select.name = category;
     select.innerHTML = `<option value="">Select ${category}</option>` +
       Object.keys(data).map(key => `<option value="${key}">${data[key].label}</option>`).join('');
     selectFormContainer.appendChild(select);
 
-    select.onchange = () => handleCategoryChange(select, selectFormContainer, data);
+    select.onchange = () => handleCategoryChange(select, selectFormContainer, data, cell);
   };
 
   // Add "Add another ..." button if not already present
   if (!cell.querySelector('.add-another-btn')) {
     const addButton = document.createElement('button');
     addButton.textContent = `Add ${category.slice(0, -1)}`;
-    addButton.className = 'btn btn-sm btn-secondary mb-2 add-another-btn';
+    addButton.className = 'btn btn-sm btn-secondary mb-2 mt-2 add-another-btn';
     addButton.type = 'button';
     addButton.onclick = createSelectBoxAndFormContainer;
     cell.appendChild(addButton);
@@ -105,7 +107,7 @@ async function createSelectBoxForCategory(category, cell) {
 
 }
 
-async function handleCategoryChange(select, container, data) {
+async function handleCategoryChange(select, container, data, cell) {
   const selectedOptionData = data[select.value];
   if (selectedOptionData && selectedOptionData.form) {
     // Append new form elements within the container
@@ -116,6 +118,14 @@ async function handleCategoryChange(select, container, data) {
   const currentRow = select.closest('tr');
   const rowIndex = Array.from(currentRow.parentNode.children).indexOf(currentRow) + 1;
   saveOrUpdateProfilerData(rowIndex);
+
+  const existingAddButton = cell.querySelector('.add-another-btn')
+
+  if (existingAddButton) {
+    existingAddButton.remove();
+  }
+
+  createSelectBoxForCategory(select.name, cell);
 }
 
 
@@ -434,33 +444,40 @@ function convertDataToJsTreeFormat(profilersData) {
   }));
 }
 
-
+/**
+ * Function to capture category configuration from a cell.
+ * @param {*} cell 
+ * @returns 
+ */
 function captureCategoryConfig(cell) {
   const configs = [];
   if (cell) {
-    const select = cell.querySelector('select');
-    const selectedType = select ? select.value : '';
-    if (selectedType) {
-      const config = {};
-      // Query all relevant form elements
-      const allElements = cell.querySelectorAll('input, select, textarea');
-      var index = 0;
-      allElements.forEach(input => {
-        // Filter out select elements with names 'sources', 'processors', 'destinations'
-        if (input.tagName.toLowerCase() === 'select' && ['sources', 'processors', 'destinations'].includes(input.name)) {
-          index++;
-          config[index] = { type: selectedType };
-          return; // Skip this iteration
+    const selects = cell.querySelectorAll('select');
+    selects.forEach(select => {
+      const selectedType = select.value;
+      if (selectedType) {
+        // Initialize config object for each select
+        const config = { type: selectedType };
 
+        // Next sibling container holds all dynamic form elements related to the select
+        let nextSiblingContainer = select.nextSibling;
+
+        while (nextSiblingContainer && !nextSiblingContainer.matches('select')) {
+          const inputs = nextSiblingContainer.querySelectorAll('input, textarea');
+          inputs.forEach(input => {
+            const value = input.type === 'checkbox' ? input.checked : input.value;
+            if (input.name && value !== undefined) {
+              config[input.name] = value;
+            }
+          });
+
+          // Move to the next sibling container, if any
+          nextSiblingContainer = nextSiblingContainer.nextSibling;
         }
-        console.log(input.name);
-        const value = input.type === 'checkbox' ? input.checked : input.value;
-        if (input.name && value !== undefined) {
-          config[index][input.name] = value;
-        }
-      });
-      configs.push(config);
-    }
+
+        configs.push(config);
+      }
+    });
   }
   return configs;
 }

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convivial Profiler Plugin Test</title>
+    <script src="//cdn.jsdelivr.net/gh/morpht/convivial-profiler@v0.1.34/dist/bundle.js"></script>
+    <script>
+        // Placeholder for initializing the Convivial Profiler
+        let profiler;
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            profiler = new window.ConvivialProfiler();
+        });
+
+        function handleSubmit(event) {
+            event.preventDefault();
+            const formType = event.target.dataset.type;
+            const formData = new FormData(event.target);
+            const values = formData.get('data').split(',');
+
+            switch (formType) {
+                case 'source':
+                    console.log('Testing Source with values:', values);
+                    // Call your source handling function here
+                    break;
+                case 'processor':
+                    console.log('Testing Processor with values:', values);
+                    // Call your processor handling function here
+                    break;
+                case 'destination':
+                    console.log('Testing Destination with values:', values);
+                    // Call your destination handling function here
+                    break;
+                default:
+                    console.log('Form type not recognized');
+            }
+
+            // Clear form input
+            event.target.reset();
+        }
+    </script>
+</head>
+<body>
+    <h1>Convivial Profiler Plugin Testing</h1>
+
+    <section>
+        <h2>Source Test</h2>
+        <form data-type="source" onsubmit="handleSubmit(event)">
+            <label for="sourceData">Enter Source Data (comma-separated):</label>
+            <input type="text" id="sourceData" name="data" required>
+            <button type="submit">Test Source</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Processor Test</h2>
+        <form data-type="processor" onsubmit="handleSubmit(event)">
+            <label for="processorData">Enter Processor Data (comma-separated):</label>
+            <input type="text" id="processorData" name="data" required>
+            <button type="submit">Test Processor</button>
+        </form>
+    </section>
+
+    <section>
+        <h2>Destination Test</h2>
+        <form data-type="destination" onsubmit="handleSubmit(event)">
+            <label for="destinationData">Enter Destination Data (comma-separated):</label>
+            <input type="text" id="destinationData" name="data" required>
+            <button type="submit">Test Destination</button>
+        </form>
+    </section>
+</body>
+</html>
