@@ -1,4 +1,7 @@
-(function (window, ConvivialProfiler, config) {
-  window.convivialProfiler = new ConvivialProfiler(config.config, config.site);
-  window.convivialProfiler.collect();
-})(window, window.ConvivialProfiler.default, testBuilder.convivialProfiler);
+// convivial-profiler-init.js
+(function (window, ConvivialProfiler) {
+  window.testBuilder.onConfigReady = function () {
+    window.convivialProfiler = new ConvivialProfiler(window.testBuilder.convivialProfiler.config, window.testBuilder.convivialProfiler.site);
+    window.convivialProfiler.collect();
+  };
+})(window, window.ConvivialProfiler.default);

@@ -49,11 +49,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 window.addEventListener('message', function(event) {
   if (event.data.action === 'getLocalStorage') {
-      // Send back the requested localStorage data
-      event.source.postMessage({
-          key: event.data.key,
-          value: localStorage.getItem(event.data.key)
-      }, event.origin);
+    // Send back the requested localStorage data
+    event.source.postMessage({
+        key: event.data.key,  
+        value: localStorage.getItem(event.data.key)
+    }, "*");
   }
 }, false);
 
@@ -122,11 +122,6 @@ async function createSelectBoxForCategory(category, cell) {
     addButton.onclick = createSelectBoxAndFormContainer;
     cell.appendChild(addButton);
   }
-
-  // Call the function to create the initial select box and form container
-  //createSelectBoxAndFormContainer();
-
-
 }
 
 async function handleCategoryChange(select, container, data, cell) {
