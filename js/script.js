@@ -15,6 +15,17 @@ document.getElementById('clearProfilersData').addEventListener('click', function
   location.reload();
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('https://raw.githubusercontent.com/morpht/convivial-profiler/main/README.md')
+      .then(response => response.text())
+      .then(markdown => {
+          // Ensure marked is called correctly
+          const htmlContent = marked.parse(markdown); // Use .parse for newer versions
+          document.getElementById('documentation-content').innerHTML = htmlContent;
+      })
+      .catch(error => console.error('Error fetching README:', error));
+});
+
 document.addEventListener('DOMContentLoaded', function () {
   loadConfiguration();
   populateProfilersFromLocalStorage();
@@ -35,6 +46,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
   buildTreeFromLocalStorage();
 });
+
+window.addEventListener('message', function(event) {
+  if (event.data.action === 'getLocalStorage') {
+      // Send back the requested localStorage data
+      event.source.postMessage({
+          key: event.data.key,
+          value: localStorage.getItem(event.data.key)
+      }, event.origin);
+  }
+}, false);
+
 
 function loadConfiguration() {
   const profilerSettings = JSON.parse(localStorage.getItem('profiler_settings'));
