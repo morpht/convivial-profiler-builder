@@ -47,9 +47,46 @@
                 <div class="tab-pane fade show active" id="uiBuilder" role="tabpanel" aria-labelledby="ui-builder-tab">
                     <!-- Existing UI Builder Content Here -->
                     <div class="mt-4">
-                        <button id="addProfiler" class="btn btn-primary mb-3">Add Profiler</button>
-                        <button onclick="downloadJSON()" class="btn btn-success mb-3">Download JSON</button>
-                        <button id="clearProfilersData" class="btn btn-danger mb-3">Clear Profilers Data</button>
+                        <h2>Settings</h2>
+                        <table class="table" id="settingsTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Site ID</th>
+                                    <th scope="col">License Key</th>
+                                    <th scope="col">Client Cleanup</th>
+                                    <th scope="col">Enable Event tracking</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input class="form-control" type="text" name="site-id" placeholder="Enter the site ID"></td>
+                                    <td><input class="form-control" type="text" name="license-key" placeholder="Enter license key, eg: community"></td>
+                                    <td><input class="form-control" type="checkbox" name="client-cleanup"></td>
+                                    <td><input class="form-control" type="checkbox" name="enable-event-tracking"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Audiences</th>
+                                    <th scope="col">Topics</th>
+                                    <th scope="col">Stages</th>
+                                    <th scope="col">Intents</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input class="form-control" type="text" name="audiences" placeholder="Enter audiences separated by comma"></td>
+                                    <td><input class="form-control" type="text" name="topics" placeholder="Enter topics separated by comma"></td>
+                                    <td><input class="form-control" type="text" name="stages" placeholder="Enter stages separated by comma"></td>
+                                    <td><input class="form-control" type="text" name="intents" placeholder="Enter intents separated by comma"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button id="addProfiler" class="btn btn-primary mt-3 mb-3">Add Profiler</button>
+                        <button id="clearProfilersData" class="btn btn-danger mt-3 mb-3">Clear Profilers Data</button>
+                        <h2>Profilers</h2>
                         <table class="table table-striped" id="profilersTable">
                             <thead>
                                 <tr>
@@ -122,6 +159,8 @@
 
         <!-- JS scripts -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+        <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.0.0/js-yaml.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>

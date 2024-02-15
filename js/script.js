@@ -149,6 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Hide the overlay when done
   document.getElementById('loadingOverlay').style.display = 'none';
+  document.body.className = 'loaded';
 });
 
 async function populateStaticFields(row, properties) {
@@ -194,7 +195,11 @@ async function handleCategory(row, category, items, delay) {
               if (key !== 'type') {
                   setTimeout(() => { // Use setTimeout to allow for dynamic form update
                       const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
-                      if (lastInput) lastInput.value = value;
+                      if (lastInput) {
+                        // Convert value to string if it's an object
+                        const inputValue = typeof value === 'object' ? JSON.stringify(value) : value;
+                        lastInput.value = inputValue;
+                      }
                   }, delay);
               }
           });
@@ -433,6 +438,9 @@ function populateDynamicFormElements(container, formData, profilerKey) {
 }
 
 function saveOrUpdateProfilerData(rowNum) {
+  if (!document.body.classList.contains('loaded')) {
+    return;
+  }
   const profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
   const row = document.querySelector(`#profilersTable tbody tr:nth-child(${rowNum})`);
 
@@ -472,6 +480,13 @@ function updateTextareaContent() {
     const data = localStorage.getItem('profilersData') || '{}';
     jsonOutput.value = JSON.stringify(JSON.parse(data), null, 2);
   }
+}
+
+// Import profiler configuration from JSON input
+function importJSON() {
+  const jsonInput = document.getElementById('jsonInput').value || '{}';
+  const data = JSON.parse(jsonInput);
+  localStorage.setItem('profilersData', JSON.stringify(data));
 }
 
 function downloadJSON() {
