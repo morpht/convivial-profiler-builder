@@ -15,6 +15,9 @@ document.getElementById('clearProfilersData').addEventListener('click', function
   location.reload();
 });
 
+// Show the overlay
+document.getElementById('loadingOverlay').style.display = 'block';
+
 document.addEventListener('DOMContentLoaded', function() {
   fetch('https://raw.githubusercontent.com/morpht/convivial-profiler/main/README.md')
       .then(response => response.text())
@@ -28,7 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function () {
   loadConfiguration();
-  populateProfilersFromLocalStorage();
 
   document.getElementById('configForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -123,6 +125,87 @@ async function createSelectBoxForCategory(category, cell) {
     cell.appendChild(addButton);
   }
 }
+document.addEventListener('DOMContentLoaded', async () => {
+  const profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
+  for (const [profilerName, properties] of Object.entries(profilersData)) {
+      // Ensure the "Add Profiler" button exists
+      const addProfilerBtn = document.getElementById('addProfiler');
+      if (addProfilerBtn) {
+          addProfilerBtn.click();
+          await wait(300); // Increase wait time to ensure dynamic content is loaded
+      }
+
+      const lastRow = document.querySelector('#profilersTable tbody tr:last-child');
+      if (!lastRow) continue; // Skip if no row is added
+
+      // Populate static fields
+      populateStaticFields(lastRow, properties);
+
+      // Handle categories with increased delay for dynamic content
+      await handleCategory(lastRow, 'sources', properties.sources, 300);
+      await handleCategory(lastRow, 'processors', properties.processors, 300);
+      await handleCategory(lastRow, 'destinations', properties.destinations, 300);
+  }
+
+  // Hide the overlay when done
+  document.getElementById('loadingOverlay').style.display = 'none';
+});
+
+async function populateStaticFields(row, properties) {
+  const inputs = {
+      label: 'input[name="label"]',
+      name: 'input[name="machine_name"]',
+      description: 'textarea[name="description"]',
+      deferred: 'input[name="deferred"]',
+      status: 'input[name="status"]'
+  };
+  Object.entries(inputs).forEach(([key, selector]) => {
+      const input = row.querySelector(selector);
+      if (!input) return; // Skip if input does not exist
+      if (key === 'deferred' || key === 'status') {
+          input.checked = properties[key];
+      } else {
+          input.value = properties[key];
+      }
+  });
+}
+
+async function handleCategory(row, category, items, delay) {
+  const cell = row.querySelector(`.${category}-cell`);
+  if (!cell) return; // Skip if cell does not exist
+
+  for (const item of items) {
+      const addButton = cell.querySelector('.add-another-btn');
+      if (addButton) {
+          addButton.click();
+          await wait(delay); // Adjusted wait for dynamic form
+      }
+
+      const selects = cell.querySelectorAll(`select[name="${category}"]`);
+      const lastSelect = selects[selects.length - 1]; // Get the last select element
+      if (!lastSelect) continue; // Skip if select does not exist
+
+      if (item.type) {
+          lastSelect.value = item.type;
+          lastSelect.dispatchEvent(new Event('change'));
+          await wait(delay); // Wait for dynamic fields to appear
+
+          Object.entries(item).forEach(([key, value]) => {
+              if (key !== 'type') {
+                  setTimeout(() => { // Use setTimeout to allow for dynamic form update
+                      const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
+                      if (lastInput) lastInput.value = value;
+                  }, delay);
+              }
+          });
+      }
+  }
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 async function handleCategoryChange(select, container, data, cell) {
   const selectedOptionData = data[select.value];
@@ -300,7 +383,7 @@ async function addProfilerForm(profiler) {
 
   // Populate the profiler form fields with saved data
   newRow.querySelector('[name="label"]').value = profiler.label || '';
-  newRow.querySelector('[name="machine_name"]').value = profiler.machine_name || '';
+  newRow.querySelector('[name="machine_name"]').value = profiler.name || '';
   newRow.querySelector('[name="description"]').value = profiler.description || '';
   newRow.querySelector('[name="deferred"]').checked = !!profiler.deferred;
   newRow.querySelector('[name="status"]').checked = !!profiler.status;
