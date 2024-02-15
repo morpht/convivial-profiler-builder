@@ -15,6 +15,27 @@ document.getElementById('clearProfilersData').addEventListener('click', function
   location.reload();
 });
 
+document.getElementById('showHideDetails').addEventListener('click', function() {
+  const detailButtons = document.querySelectorAll('#profilersTable .hide-show-details');
+
+  detailButtons.forEach(button => {
+    button.click();
+  });
+});
+
+// Attach event listener to the table containing the buttons
+document.getElementById('profilersTable').addEventListener('click', function(event) {
+  // Check if the clicked element has the 'hide-show-details' class
+  if (event.target && event.target.matches('.hide-show-details')) {
+    // Find the closest parent row (<tr>)
+    const parentRow = event.target.closest('tr');
+    // Toggle visibility of all .dynamic-form-cell elements within the same row
+    parentRow.querySelectorAll('.dynamic-form-cell *').forEach(cell => {
+      cell.classList.toggle('d-none'); // Using Bootstrap's 'd-none' class to hide elements
+    });
+  }
+});
+
 // Show the overlay
 document.getElementById('loadingOverlay').style.display = 'block';
 
@@ -267,6 +288,7 @@ async function addProfiler() {
                   <input type="checkbox" class="form-check-input" name="status"> Status
               </label>
           </div>
+          <button type="button" class="hide-show-details btn btn-sm btn-info mb-1 mt-3">Show/Hide Details</button>
       `;
   row.appendChild(propertiesCell);
 
@@ -274,6 +296,7 @@ async function addProfiler() {
   const categories = ['sources', 'processors', 'destinations'];
   categories.forEach(category => {
     const cell = document.createElement('td');
+    cell.classList.add('dynamic-form-cell');
     cell.classList.add(`${category}-cell`);
     row.appendChild(cell);
     createSelectBoxForCategory(category, cell);
@@ -487,6 +510,7 @@ function importJSON() {
   const jsonInput = document.getElementById('jsonInput').value || '{}';
   const data = JSON.parse(jsonInput);
   localStorage.setItem('profilersData', JSON.stringify(data));
+  location.reload();
 }
 
 function downloadJSON() {
