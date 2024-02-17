@@ -146,32 +146,6 @@ async function createSelectBoxForCategory(category, cell) {
     cell.appendChild(addButton);
   }
 }
-// document.addEventListener('DOMContentLoaded', async () => {
-//   const profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
-//   for (const [profilerName, properties] of Object.entries(profilersData)) {
-//       // Ensure the "Add Profiler" button exists
-//       const addProfilerBtn = document.getElementById('addProfiler');
-//       if (addProfilerBtn) {
-//           addProfilerBtn.click();
-//           await wait(300); // Increase wait time to ensure dynamic content is loaded
-//       }
-
-//       const lastRow = document.querySelector('#profilersTable tbody tr:last-child');
-//       if (!lastRow) continue; // Skip if no row is added
-
-//       // Populate static fields
-//       populateStaticFields(lastRow, properties);
-
-//       // Handle categories with increased delay for dynamic content
-//       await handleCategory(lastRow, 'sources', properties.sources, 300);
-//       await handleCategory(lastRow, 'processors', properties.processors, 300);
-//       await handleCategory(lastRow, 'destinations', properties.destinations, 300);
-//   }
-
-//   // Hide the overlay when done
-//   document.getElementById('loadingOverlay').style.display = 'none';
-//   document.body.className = 'loaded';
-// });
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Load and parse the combined settings and profiler data from local storage
