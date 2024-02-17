@@ -15,7 +15,7 @@ document.getElementById('clearProfilersData').addEventListener('click', function
   location.reload();
 });
 
-document.getElementById('showHideDetails').addEventListener('click', function() {
+document.getElementById('showHideDetails').addEventListener('click', function () {
   const detailButtons = document.querySelectorAll('#profilersTable .hide-show-details');
 
   detailButtons.forEach(button => {
@@ -24,7 +24,7 @@ document.getElementById('showHideDetails').addEventListener('click', function() 
 });
 
 // Attach event listener to the table containing the buttons
-document.getElementById('profilersTable').addEventListener('click', function(event) {
+document.getElementById('profilersTable').addEventListener('click', function (event) {
   // Check if the clicked element has the 'hide-show-details' class
   if (event.target && event.target.matches('.hide-show-details')) {
     // Find the closest parent row (<tr>)
@@ -39,15 +39,15 @@ document.getElementById('profilersTable').addEventListener('click', function(eve
 // Show the overlay
 document.getElementById('loadingOverlay').style.display = 'block';
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   fetch('https://raw.githubusercontent.com/morpht/convivial-profiler/main/README.md')
-      .then(response => response.text())
-      .then(markdown => {
-          // Ensure marked is called correctly
-          const htmlContent = marked.parse(markdown); // Use .parse for newer versions
-          document.getElementById('documentation-content').innerHTML = htmlContent;
-      })
-      .catch(error => console.error('Error fetching README:', error));
+    .then(response => response.text())
+    .then(markdown => {
+      // Ensure marked is called correctly
+      const htmlContent = marked.parse(markdown); // Use .parse for newer versions
+      document.getElementById('documentation-content').innerHTML = htmlContent;
+    })
+    .catch(error => console.error('Error fetching README:', error));
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -70,12 +70,12 @@ document.addEventListener('DOMContentLoaded', function () {
   buildTreeFromLocalStorage();
 });
 
-window.addEventListener('message', function(event) {
+window.addEventListener('message', function (event) {
   if (event.data.action === 'getLocalStorage') {
     // Send back the requested localStorage data
     event.source.postMessage({
-        key: event.data.key,  
-        value: localStorage.getItem(event.data.key)
+      key: event.data.key,
+      value: localStorage.getItem(event.data.key)
     }, "*");
   }
 }, false);
@@ -146,26 +146,69 @@ async function createSelectBoxForCategory(category, cell) {
     cell.appendChild(addButton);
   }
 }
+// document.addEventListener('DOMContentLoaded', async () => {
+//   const profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
+//   for (const [profilerName, properties] of Object.entries(profilersData)) {
+//       // Ensure the "Add Profiler" button exists
+//       const addProfilerBtn = document.getElementById('addProfiler');
+//       if (addProfilerBtn) {
+//           addProfilerBtn.click();
+//           await wait(300); // Increase wait time to ensure dynamic content is loaded
+//       }
+
+//       const lastRow = document.querySelector('#profilersTable tbody tr:last-child');
+//       if (!lastRow) continue; // Skip if no row is added
+
+//       // Populate static fields
+//       populateStaticFields(lastRow, properties);
+
+//       // Handle categories with increased delay for dynamic content
+//       await handleCategory(lastRow, 'sources', properties.sources, 300);
+//       await handleCategory(lastRow, 'processors', properties.processors, 300);
+//       await handleCategory(lastRow, 'destinations', properties.destinations, 300);
+//   }
+
+//   // Hide the overlay when done
+//   document.getElementById('loadingOverlay').style.display = 'none';
+//   document.body.className = 'loaded';
+// });
+
 document.addEventListener('DOMContentLoaded', async () => {
-  const profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
+  // Load and parse the combined settings and profiler data from local storage
+  const storedData = JSON.parse(localStorage.getItem('profilersData')) || {};
+  const profilersData = storedData.config ? storedData.config.profiles : {}; // Update for new data structure
+
+  // Populate site settings and data if available
+  if (storedData.site) document.querySelector('input[name="site-id"]').value = storedData.site;
+  if (storedData.license_key) document.querySelector('input[name="license-key"]').value = storedData.license_key;
+  if (storedData.hasOwnProperty('client_cleanup')) document.querySelector('input[name="client-cleanup"]').checked = storedData.client_cleanup;
+  if (storedData.hasOwnProperty('event_tracking')) document.querySelector('input[name="enable-event-tracking"]').checked = storedData.event_tracking;
+
+  // Populate data settings
+  if (storedData.config && storedData.config.data) {
+    const { audiences, topics, stages, intents } = storedData.config.data;
+    document.querySelector('input[name="audiences"]').value = audiences.join(',');
+    document.querySelector('input[name="topics"]').value = topics.join(',');
+    document.querySelector('input[name="stages"]').value = stages.join(',');
+    document.querySelector('input[name="intents"]').value = intents.join(',');
+  }
+
+  // Process each profiler
   for (const [profilerName, properties] of Object.entries(profilersData)) {
-      // Ensure the "Add Profiler" button exists
-      const addProfilerBtn = document.getElementById('addProfiler');
-      if (addProfilerBtn) {
-          addProfilerBtn.click();
-          await wait(300); // Increase wait time to ensure dynamic content is loaded
-      }
+    const addProfilerBtn = document.getElementById('addProfiler');
+    if (addProfilerBtn) {
+      addProfilerBtn.click();
+      await wait(300); // Ensure dynamic content has loaded
+    }
 
-      const lastRow = document.querySelector('#profilersTable tbody tr:last-child');
-      if (!lastRow) continue; // Skip if no row is added
+    const lastRow = document.querySelector('#profilersTable tbody tr:last-child');
+    if (!lastRow) continue; // Skip if no row is added
 
-      // Populate static fields
-      populateStaticFields(lastRow, properties);
+    populateStaticFields(lastRow, properties);
 
-      // Handle categories with increased delay for dynamic content
-      await handleCategory(lastRow, 'sources', properties.sources, 300);
-      await handleCategory(lastRow, 'processors', properties.processors, 300);
-      await handleCategory(lastRow, 'destinations', properties.destinations, 300);
+    await handleCategory(lastRow, 'sources', properties.sources || [], 300);
+    await handleCategory(lastRow, 'processors', properties.processors || [], 300);
+    await handleCategory(lastRow, 'destinations', properties.destinations || [], 300);
   }
 
   // Hide the overlay when done
@@ -173,22 +216,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.body.className = 'loaded';
 });
 
+
 async function populateStaticFields(row, properties) {
   const inputs = {
-      label: 'input[name="label"]',
-      name: 'input[name="machine_name"]',
-      description: 'textarea[name="description"]',
-      deferred: 'input[name="deferred"]',
-      status: 'input[name="status"]'
+    label: 'input[name="label"]',
+    name: 'input[name="machine_name"]',
+    description: 'textarea[name="description"]',
+    deferred: 'input[name="deferred"]',
+    status: 'input[name="status"]'
   };
   Object.entries(inputs).forEach(([key, selector]) => {
-      const input = row.querySelector(selector);
-      if (!input) return; // Skip if input does not exist
-      if (key === 'deferred' || key === 'status') {
-          input.checked = properties[key];
-      } else {
-          input.value = properties[key];
-      }
+    const input = row.querySelector(selector);
+    if (!input) return; // Skip if input does not exist
+    if (key === 'deferred' || key === 'status') {
+      input.checked = properties[key];
+    } else {
+      input.value = properties[key];
+    }
   });
 }
 
@@ -197,34 +241,34 @@ async function handleCategory(row, category, items, delay) {
   if (!cell) return; // Skip if cell does not exist
 
   for (const item of items) {
-      const addButton = cell.querySelector('.add-another-btn');
-      if (addButton) {
-          addButton.click();
-          await wait(delay); // Adjusted wait for dynamic form
-      }
+    const addButton = cell.querySelector('.add-another-btn');
+    if (addButton) {
+      addButton.click();
+      await wait(delay); // Adjusted wait for dynamic form
+    }
 
-      const selects = cell.querySelectorAll(`select[name="${category}"]`);
-      const lastSelect = selects[selects.length - 1]; // Get the last select element
-      if (!lastSelect) continue; // Skip if select does not exist
+    const selects = cell.querySelectorAll(`select[name="${category}"]`);
+    const lastSelect = selects[selects.length - 1]; // Get the last select element
+    if (!lastSelect) continue; // Skip if select does not exist
 
-      if (item.type) {
-          lastSelect.value = item.type;
-          lastSelect.dispatchEvent(new Event('change'));
-          await wait(delay); // Wait for dynamic fields to appear
+    if (item.type) {
+      lastSelect.value = item.type;
+      lastSelect.dispatchEvent(new Event('change'));
+      await wait(delay); // Wait for dynamic fields to appear
 
-          Object.entries(item).forEach(([key, value]) => {
-              if (key !== 'type') {
-                  setTimeout(() => { // Use setTimeout to allow for dynamic form update
-                      const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
-                      if (lastInput) {
-                        // Convert value to string if it's an object
-                        const inputValue = typeof value === 'object' ? JSON.stringify(value) : value;
-                        lastInput.value = inputValue;
-                      }
-                  }, delay);
-              }
-          });
-      }
+      Object.entries(item).forEach(([key, value]) => {
+        if (key !== 'type') {
+          setTimeout(() => { // Use setTimeout to allow for dynamic form update
+            const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
+            if (lastInput) {
+              // Convert value to string if it's an object
+              const inputValue = typeof value === 'object' ? JSON.stringify(value) : value;
+              lastInput.value = inputValue;
+            }
+          }, delay);
+        }
+      });
+    }
   }
 }
 
@@ -464,7 +508,25 @@ function saveOrUpdateProfilerData(rowNum) {
   if (!document.body.classList.contains('loaded')) {
     return;
   }
-  const profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
+
+  // Retrieve settings from form inputs
+  const siteId = document.querySelector('input[name="site-id"]').value;
+  const licenseKey = document.querySelector('input[name="license-key"]').value;
+  const clientCleanup = document.querySelector('input[name="client-cleanup"]').checked;
+  const eventTracking = document.querySelector('input[name="enable-event-tracking"]').checked;
+
+  // Retrieve data from form inputs
+  const audiences = document.querySelector('input[name="audiences"]').value.split(',');
+  const topics = document.querySelector('input[name="topics"]').value.split(',');
+  const stages = document.querySelector('input[name="stages"]').value.split(',');
+  const intents = document.querySelector('input[name="intents"]').value.split(',');
+  let profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
+
+  if (profilersData["config"] !== undefined) {
+    console.log(profilersData);
+    profilersData = profilersData["config"]["profiles"];
+  }
+
   const row = document.querySelector(`#profilersTable tbody tr:nth-child(${rowNum})`);
 
   if (!row) {
@@ -492,7 +554,24 @@ function saveOrUpdateProfilerData(rowNum) {
   };
 
   profilersData[machineName] = profilerData;
-  localStorage.setItem('profilersData', JSON.stringify(profilersData));
+
+  const newSettingsAndData = {
+    site: siteId,
+    license_key: licenseKey,
+    client_cleanup: clientCleanup,
+    event_tracking: eventTracking,
+    config: {
+      data: {
+        audiences: audiences.map(audience => audience.trim()), // Ensure we trim whitespace
+        topics: topics.map(topic => topic.trim()),
+        stages: stages.map(stage => stage.trim()),
+        intents: intents.map(intent => intent.trim())
+      },
+      profiles: profilersData
+    }
+  };
+
+  localStorage.setItem('profilersData', JSON.stringify(newSettingsAndData));
   updateTextareaContent();
   buildTreeFromLocalStorage(); // Refresh the tree
 }
