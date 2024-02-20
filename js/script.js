@@ -50,6 +50,31 @@ document.addEventListener('DOMContentLoaded', function () {
     .catch(error => console.error('Error fetching README:', error));
 });
 
+document.getElementById('addColumnBtn').addEventListener('click', addColumn);
+
+function addColumn() {
+  const columnName = prompt("Enter the name for the new data property:", "");
+  if (columnName) {
+    const headerRow = document.getElementById('tableHeaders');
+    const dataRow = document.getElementById('tableRow');
+
+    // Add new header
+    const newHeader = document.createElement('th');
+    newHeader.textContent = columnName;
+    headerRow.appendChild(newHeader);
+
+    // Add input cell to the data row
+    const newDataCell = document.createElement('td');
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Enter values separated by comma for ' + columnName.toLowerCase().replace(/\s+/g, '_') + '...';
+    input.setAttribute('name', columnName.toLowerCase().replace(/\s+/g, '_'));
+    input.className = 'form-control mb-2 mt-2';
+    newDataCell.appendChild(input);
+    dataRow.appendChild(newDataCell);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   loadConfiguration();
 
@@ -158,13 +183,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (storedData.hasOwnProperty('client_cleanup')) document.querySelector('input[name="client-cleanup"]').checked = storedData.client_cleanup;
   if (storedData.hasOwnProperty('event_tracking')) document.querySelector('input[name="enable-event-tracking"]').checked = storedData.event_tracking;
 
-  // Populate data settings
+  // Dynamically create and populate table based on stored configuration
   if (storedData.config && storedData.config.data) {
-    const { audiences, topics, stages, intents } = storedData.config.data;
-    document.querySelector('input[name="audiences"]').value = audiences.join(',');
-    document.querySelector('input[name="topics"]').value = topics.join(',');
-    document.querySelector('input[name="stages"]').value = stages.join(',');
-    document.querySelector('input[name="intents"]').value = intents.join(',');
+    Object.entries(storedData.config.data).forEach(([key, values]) => {
+      addDynamicColumn(key, values);
+    });
   }
 
   // Process each profiler
@@ -190,6 +213,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.body.className = 'loaded';
 });
 
+function addDynamicColumn(key, values) {
+  const columnName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Convert snake_case to Title Case
+  // Add column header
+  const headerRow = document.getElementById('tableHeaders');
+  const newHeader = document.createElement('th');
+  newHeader.textContent = columnName;
+  headerRow.appendChild(newHeader);
+
+  // Add input cell to the data row
+  const dataRow = document.getElementById('tableRow');
+  const newDataCell = document.createElement('td');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.setAttribute('name', key);
+  input.className = 'form-control mb-2 mt-2';
+  input.value = Array.isArray(values) ? values.join(',') : values; // Assuming values is an array, join with commas
+  newDataCell.appendChild(input);
+  dataRow.appendChild(newDataCell);
+}
 
 async function populateStaticFields(row, properties) {
   const inputs = {
@@ -489,15 +531,19 @@ function saveOrUpdateProfilerData(rowNum) {
   const clientCleanup = document.querySelector('input[name="client-cleanup"]').checked;
   const eventTracking = document.querySelector('input[name="enable-event-tracking"]').checked;
 
-  // Retrieve data from form inputs
-  const audiences = document.querySelector('input[name="audiences"]').value.split(',');
-  const topics = document.querySelector('input[name="topics"]').value.split(',');
-  const stages = document.querySelector('input[name="stages"]').value.split(',');
-  const intents = document.querySelector('input[name="intents"]').value.split(',');
+  // Initialize an object to hold dynamic data fields
+  let dynamicDataFields = {};
+
+  // Retrieve dynamic data from the table based on added columns
+  document.querySelectorAll(`#dataTable thead th`).forEach((th, index) => {
+    const inputName = th.textContent.toLowerCase().replace(/\s+/g, '_');
+    const inputValue = document.querySelector(`#dataTable tbody tr td:nth-child(${index + 1}) input`).value;
+    dynamicDataFields[inputName] = inputValue.split(',').map(item => item.trim()); // Split by comma and trim spaces
+  });
+
   let profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
 
   if (profilersData["config"] !== undefined) {
-    console.log(profilersData);
     profilersData = profilersData["config"]["profiles"];
   }
 
@@ -535,12 +581,7 @@ function saveOrUpdateProfilerData(rowNum) {
     client_cleanup: clientCleanup,
     event_tracking: eventTracking,
     config: {
-      data: {
-        audiences: audiences.map(audience => audience.trim()), // Ensure we trim whitespace
-        topics: topics.map(topic => topic.trim()),
-        stages: stages.map(stage => stage.trim()),
-        intents: intents.map(intent => intent.trim())
-      },
+      data: dynamicDataFields, // Use dynamic data fields here
       profiles: profilersData
     }
   };

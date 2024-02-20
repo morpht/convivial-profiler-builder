@@ -66,24 +66,19 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <button class="btn btn-primary mt-3 mb-4" id="addColumnBtn">Add Data</button>
                         <h3>Data</h3>
                         <table class="table" id="dataTable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Audiences</th>
-                                    <th scope="col">Topics</th>
-                                    <th scope="col">Stages</th>
-                                    <th scope="col">Intents</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input class="form-control" type="text" name="audiences" placeholder="Enter audiences separated by comma"></td>
-                                    <td><input class="form-control" type="text" name="topics" placeholder="Enter topics separated by comma"></td>
-                                    <td><input class="form-control" type="text" name="stages" placeholder="Enter stages separated by comma"></td>
-                                    <td><input class="form-control" type="text" name="intents" placeholder="Enter intents separated by comma"></td>
-                                </tr>
-                            </tbody>
+                        <thead>
+                            <tr id="tableHeaders">
+                            <!-- Column headers will be added here dynamically -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="tableRow">
+                            <!-- Column cells will be added here dynamically -->
+                            </tr>
+                        </tbody>
                         </table>
                         <button id="addProfiler" class="btn btn-primary mt-3 mb-4">Add Profiler</button>
                         <button id="showHideDetails" type="button" class="btn btn-info mb-4 mt-3">Show/Hide Profilers Details</button>
