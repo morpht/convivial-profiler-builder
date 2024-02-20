@@ -175,7 +175,7 @@ async function createSelectBoxForCategory(category, cell) {
 document.addEventListener('DOMContentLoaded', async () => {
   // Load and parse the combined settings and profiler data from local storage
   const storedData = JSON.parse(localStorage.getItem('profilersData')) || {};
-  const profilersData = storedData.config ? storedData.config.profiles : {}; // Update for new data structure
+  const profilersData = storedData.config ? storedData.config.profilers : {}; // Update for new data structure
 
   // Populate site settings and data if available
   if (storedData.site) document.querySelector('input[name="site-id"]').value = storedData.site;
@@ -544,7 +544,7 @@ function saveOrUpdateProfilerData(rowNum) {
   let profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
 
   if (profilersData["config"] !== undefined) {
-    profilersData = profilersData["config"]["profiles"];
+    profilersData = profilersData["config"]["profilers"];
   }
 
   const row = document.querySelector(`#profilersTable tbody tr:nth-child(${rowNum})`);
@@ -582,7 +582,7 @@ function saveOrUpdateProfilerData(rowNum) {
     event_tracking: eventTracking,
     config: {
       data: dynamicDataFields, // Use dynamic data fields here
-      profiles: profilersData
+      profilers: profilersData
     }
   };
 
