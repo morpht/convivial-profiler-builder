@@ -380,6 +380,7 @@ function createFormElements(formDefinition, container, category, selectedType) {
   // Clear out any previously added dynamic form elements
   const existingDynamicElements = container.querySelectorAll('.dynamic-form-element');
   existingDynamicElements.forEach(el => el.remove());
+  let lastFormGroup = '';
 
   Object.entries(formDefinition).forEach(([key, field]) => {
     const formGroup = document.createElement('div');
@@ -435,6 +436,8 @@ function createFormElements(formDefinition, container, category, selectedType) {
       formGroup.appendChild(input);
     }
 
+    lastFormGroup = formGroup;
+
     // Attach event listener to input for updating localStorage on change
     input.addEventListener('change', function () {
       const currentRow = this.closest('tr');
@@ -442,6 +445,41 @@ function createFormElements(formDefinition, container, category, selectedType) {
       saveOrUpdateProfilerData(rowIndex);
     });
   });
+
+  if (category === 'sources') {
+    const selectBox = createSelectBoxFromTableInputs("dataTable", selectedType);
+    lastFormGroup.appendChild(selectBox);
+    selectBox.addEventListener('change', function () {
+      const currentRow = this.closest('tr');
+      const rowIndex = Array.from(currentRow.parentNode.children).indexOf(currentRow) + 1;
+      saveOrUpdateProfilerData(rowIndex);
+    });
+    //example_data.onchange = () => handleCategoryChange(select, selectFormContainer, data, cell);
+  }
+}
+
+// Function to create a select box based on inputs in a specific table
+function createSelectBoxFromTableInputs(tableName, category) {
+  const table = document.getElementById(tableName);
+  const inputs = table.querySelectorAll('input[type="text"]'); // Assuming you're interested in text inputs
+
+  // Create the select element
+  let select = document.createElement('select');
+  select.className = 'example-data-select form-control mb-2 mt-2';
+  select.name = 'example_data';
+  // Default option
+  select.innerHTML = `<option value="">Choose Example Data for "${category}" source</option>`;
+
+  // Add options dynamically based on input names in the table
+  inputs.forEach(input => {
+    const name = input.name;
+    const option = document.createElement('option');
+    option.value = name;
+    option.textContent = name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Assuming snake_case to Title Case
+    select.appendChild(option);
+  });
+
+  return select;
 }
 
 // Invoke saveOrUpdateProfilerData for input changes
