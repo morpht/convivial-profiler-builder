@@ -254,34 +254,40 @@ async function populateStaticFields(row, properties) {
 
 async function handleCategory(row, category, items, delay) {
   const cell = row.querySelector(`.${category}-cell`);
-  if (!cell) return; // Skip if cell does not exist
+  if (!cell) return;
 
-  for (const item of items) {
+  for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+    const item = items[itemIndex];
     const addButton = cell.querySelector('.add-another-btn');
     if (addButton) {
       addButton.click();
-      await wait(delay); // Adjusted wait for dynamic form
+      await wait(delay);
     }
 
     const selects = cell.querySelectorAll(`select[name="${category}"]`);
-    const lastSelect = selects[selects.length - 1]; // Get the last select element
-    if (!lastSelect) continue; // Skip if select does not exist
+    const lastSelect = selects[selects.length - 1];
+    if (!lastSelect) continue;
 
     if (item.type) {
       lastSelect.value = item.type;
       lastSelect.dispatchEvent(new Event('change'));
       await wait(delay); // Wait for dynamic fields to appear
 
-      Object.entries(item).forEach(([key, value]) => {
+      Object.entries(item).forEach(async ([key, value]) => {
         if (key !== 'type') {
-          setTimeout(() => { // Use setTimeout to allow for dynamic form update
-            const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
-            if (lastInput) {
-              // Convert value to string if it's an object
-              const inputValue = typeof value === 'object' ? JSON.stringify(value) : value;
-              lastInput.value = inputValue;
+          await wait(delay);
+          const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
+          if (lastInput) {
+            lastInput.value = typeof value === 'object' ? JSON.stringify(value) : value;
+          }
+
+          // Correctly handle example_data
+          if (key === 'example_data') {
+            const exampleDataSelect = cell.querySelector(`select.example-data-select[data-source-index="${itemIndex}"]`);
+            if (exampleDataSelect) {
+              exampleDataSelect.value = value;
             }
-          }, delay);
+          }
         }
       });
     }
@@ -292,12 +298,11 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-
 async function handleCategoryChange(select, container, data, cell) {
   const selectedOptionData = data[select.value];
   if (selectedOptionData && selectedOptionData.form) {
-    // Append new form elements within the container
-    createFormElements(selectedOptionData.form, container, select.name, select.value);
+    const sourceIndex = Array.from(cell.querySelectorAll('select[name="' + select.name + '"]')).indexOf(select);
+    createFormElements(selectedOptionData.form, container, select.name, select.value, sourceIndex);
   }
 
   // Trigger save to include all dynamic forms
@@ -376,8 +381,7 @@ function attachRowEventListeners(row, rowNum) {
   });
 }
 
-function createFormElements(formDefinition, container, category, selectedType) {
-  // Clear out any previously added dynamic form elements
+function createFormElements(formDefinition, container, category, selectedType, sourceIndex) {
   const existingDynamicElements = container.querySelectorAll('.dynamic-form-element');
   existingDynamicElements.forEach(el => el.remove());
   let lastFormGroup = '';
@@ -447,7 +451,7 @@ function createFormElements(formDefinition, container, category, selectedType) {
   });
 
   if (category === 'sources') {
-    const selectBox = createSelectBoxFromTableInputs("dataTable", selectedType);
+    const selectBox = createSelectBoxFromTableInputs("dataTable", selectedType, sourceIndex);
     lastFormGroup.appendChild(selectBox);
     selectBox.addEventListener('change', function () {
       const currentRow = this.closest('tr');
@@ -459,7 +463,7 @@ function createFormElements(formDefinition, container, category, selectedType) {
 }
 
 // Function to create a select box based on inputs in a specific table
-function createSelectBoxFromTableInputs(tableName, category) {
+function createSelectBoxFromTableInputs(tableName, category, sourceIndex) {
   const table = document.getElementById(tableName);
   const inputs = table.querySelectorAll('input[type="text"]'); // Assuming you're interested in text inputs
 
@@ -467,6 +471,7 @@ function createSelectBoxFromTableInputs(tableName, category) {
   let select = document.createElement('select');
   select.className = 'example-data-select form-control mb-2 mt-2';
   select.name = 'example_data';
+  select.setAttribute('data-source-index', sourceIndex); // sourceIndex should be the index of the source in the sources array
   // Default option
   select.innerHTML = `<option value="">Choose Example Data for "${category}" source</option>`;
 
@@ -723,7 +728,7 @@ function convertDataToJsTreeFormat(profilersData) {
 function captureCategoryConfig(cell) {
   const configs = [];
   if (cell) {
-    const selects = cell.querySelectorAll('select');
+    const selects = cell.querySelectorAll('select:not(.example-data-select)');
     selects.forEach(select => {
       const selectedType = select.value;
       if (selectedType) {
@@ -734,13 +739,19 @@ function captureCategoryConfig(cell) {
         let nextSiblingContainer = select.nextSibling;
 
         while (nextSiblingContainer && !nextSiblingContainer.matches('select')) {
-          const inputs = nextSiblingContainer.querySelectorAll('input, textarea');
+          const inputs = nextSiblingContainer.querySelectorAll('input, textarea, select');
           inputs.forEach(input => {
             const value = input.type === 'checkbox' ? input.checked : input.value;
             if (input.name && value !== undefined) {
               config[input.name] = value;
             }
           });
+
+          // Specifically capture 'example_data' if present for the source
+          const exampleDataSelect = nextSiblingContainer.querySelector('.example-data-select');
+          if (exampleDataSelect && exampleDataSelect.value !== '') {
+            config['example_data'] = exampleDataSelect.value;
+          }
 
           // Move to the next sibling container, if any
           nextSiblingContainer = nextSiblingContainer.nextSibling;
