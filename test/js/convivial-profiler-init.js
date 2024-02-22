@@ -2,14 +2,13 @@
 (function (window, ConvivialProfiler) {
   document.addEventListener('DOMContentLoaded', function () {
     const jsonData = JSON.parse(localStorage.getItem('profilersData')) || {};
-    console.log(jsonData);
     const tbody = document.querySelector('#profilersTable tbody');
   
     Object.entries(jsonData.config.profilers).forEach(([name, profiler], index) => {
         const row = tbody.insertRow();
         row.innerHTML = `
             <th scope="row">
-              <h5>Name: ${name}</h5>
+              <h5>Profiler: ${name}</h5>
               <button type="button" class="btn btn-success execute-profiler mt-2 btn-sm disabled">Execute</button>
               <textarea id="testingProfiler" class="form-control mt-4" style="height: 600px;"></textarea>
 
@@ -30,12 +29,12 @@
                 <h5 class="accordion-header" id="heading${collapseId}">${item.type}</h5>
                 <div id="${collapseId}">
                     <div class="accordion-body">
-                      ${Object.entries(item).filter(([key]) => key !== 'type').map(([key, value]) => 
-                      `<div class="mb-3">
-                          <label class="form-label">${value} (${key})</label>
-                          <input type="text" class="form-control" name="${key}" value="${value}">
-                      </div>`
-                ).join('')}
+                      ${Object.entries(item).filter(([key, value]) => key !== 'type' && value !== '' && key !== 'example_data').map(([key, value]) => 
+                        `<div class="mb-3">
+                            <label class="form-label">${value} (${key})</label>
+                            <input type="text" class="form-control" name="${value}" placeholder="Enter a test value for '${value}'">
+                        </div>`
+                      ).join('')}
                     </div>
                 </div>
             </div>
