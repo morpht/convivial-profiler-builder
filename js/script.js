@@ -598,7 +598,8 @@ function saveOrUpdateProfilerData(rowNum) {
   }
 
   const labelValue = row.querySelector('input[name="label"]').value;
-  const machineName = row.querySelector('input[name="machine_name"]').value || generateMachineName(labelValue);
+  let machineName = row.querySelector('input[name="machine_name"]').value;
+  machineName = generateMachineName(machineName);
 
   if (!machineName) {
     return;

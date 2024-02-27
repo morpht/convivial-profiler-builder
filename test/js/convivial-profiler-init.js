@@ -2,12 +2,12 @@
 
 function copyToClipboard() {
   const textarea = document.getElementById('testingProfiler');
-  textarea.select(); // Select the text
+  textarea.select();
   document.execCommand('copy');
 
   swal({
     title: "Copied!",
-    text: "Content copied to clipboard.",
+    text: "Log copied to clipboard.",
     icon: "success",
     button: "OK",
 });
@@ -15,9 +15,8 @@ function copyToClipboard() {
 
 function logMessage(message, type) {
   const textarea = document.getElementById('testingProfiler');
-  if (!textarea) return; // Exit if textarea not found
+  if (!textarea) return;
 
-  // Define emoji for each message type
   const emojis = {
       'info': 'ℹ️',
       'success': '✅',
@@ -25,20 +24,21 @@ function logMessage(message, type) {
       'error': '❌'
   };
 
-  // Default to 'info' type if the specified type is not recognized
   const emoji = emojis[type] || emojis['info'];
-
-  // Format the message
   const formattedMessage = `${emoji} [${type.toUpperCase()}] - ${message}\n`;
 
-  // Append the formatted message to the textarea
   textarea.value += formattedMessage;
-
-  // Scroll to the bottom of the textarea to ensure the latest log is visible
   textarea.scrollTop = textarea.scrollHeight;
 }
 
-(function (window, ConvivialProfiler) {
+function extractProfiler(jsonData, profilerId) {
+  const profiler = jsonData.config.profilers[profilerId];
+  jsonData.config.profilers = { [profilerId]: profiler };
+
+  return jsonData;
+}
+
+(function (window, ConvivialProfiler) {  
   document.addEventListener('DOMContentLoaded', function () {
     const jsonData = JSON.parse(localStorage.getItem('profilersData')) || {};
     const tbody = document.querySelector('#profilersTable tbody');
@@ -48,7 +48,7 @@ function logMessage(message, type) {
       row.innerHTML = `
         <td>
           <h4 class="mb-4 mt-4">Profiler: ${name}</h4>
-          <h5 class="mb-4">Test data:</h5>
+          <h5 class="mb-4">1) Build test data:</h5>
           ${generateAccordion(jsonData, name, profiler.sources, 'sources-' + index)}
         </td>
         <td class="w-75 code-container">
@@ -57,7 +57,21 @@ function logMessage(message, type) {
         </td>
     `;
     });
+
+    // Attach click event listener to all buttons with class 'execute-profilers'
+    document.querySelectorAll('.execute-profilers').forEach(function(button) {
+      button.addEventListener('click', function(event) {
+        // Prevent the default action if needed
+        event.preventDefault();
+        executeProfilers();
+      });
+    });
   });
+
+  function executeProfilers() {
+    window.convivialProfiler.collect();
+    console.log(window.convivialProfiler);
+  }
 
   // Generate the accordion HTML.
   function generateAccordion(jsonData, profiler_name, items, parentId) {
