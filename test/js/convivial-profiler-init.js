@@ -64,13 +64,17 @@ function extractProfiler(jsonData, profilerId) {
         // Prevent the default action if needed
         event.preventDefault();
         executeProfilers();
+        
       });
     });
   });
 
   function executeProfilers() {
     window.convivialProfiler.collect();
-    console.log(window.convivialProfiler);
+
+    const jsonData = JSON.parse(localStorage.getItem('convivial_profiler')) || {};
+    const prettyJsonString = JSON.stringify(jsonData, null, 2); // 2 spaces for indentation
+    logMessage(prettyJsonString, 'info');
   }
 
   // Generate the accordion HTML.
