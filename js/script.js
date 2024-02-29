@@ -10,8 +10,6 @@ document.getElementById('clearProfilersData').addEventListener('click', function
   localStorage.removeItem('profilersData');
   alert('Profilers data cleared from local storage.');
   updateTextareaContent();
-  buildTreeFromLocalStorage();
-
   location.reload();
 });
 
@@ -91,8 +89,6 @@ document.addEventListener('DOMContentLoaded', function () {
     localStorage.setItem('profiler_settings', JSON.stringify(profilerSettings));
     updateFetchURLs();
   });
-
-  buildTreeFromLocalStorage();
 });
 
 window.addEventListener('message', function (event) {
@@ -212,6 +208,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('loadingOverlay').style.display = 'none';
   document.body.className = 'loaded';
 });
+
+
+function loadProfilerData(profilerID) {
+  
+}
 
 function addDynamicColumn(key, values) {
   const columnName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Convert snake_case to Title Case
@@ -632,7 +633,6 @@ function saveOrUpdateProfilerData(rowNum) {
 
   localStorage.setItem('profilersData', JSON.stringify(newSettingsAndData));
   updateTextareaContent();
-  buildTreeFromLocalStorage(); // Refresh the tree
 }
 
 function updateTextareaContent() {
@@ -660,65 +660,6 @@ function downloadJSON() {
   a.download = 'profiler.json';
   a.click();
   URL.revokeObjectURL(url);
-}
-
-function buildTreeFromLocalStorage() {
-  const profilersData = JSON.parse(localStorage.getItem('profilersData') || '{}');
-  const treeData = convertDataToJsTreeFormat(profilersData);
-
-  // Check if jsTree has already been initialized on the #profilersTree
-  if ($('#profilersTree').data('jstree')) {
-    // jsTree is already initialized, refresh its data
-    $('#profilersTree').jstree(true).settings.core.data = treeData;
-    $('#profilersTree').jstree(true).refresh();
-  } else {
-    // Initialize jsTree for the first time
-    $('#profilersTree').jstree({
-      'core': {
-        'data': treeData,
-        "themes": { "stripes": true },
-      }
-    });
-  }
-}
-
-// Function to convert profiler data to jsTree format
-function convertDataToJsTreeFormat(profilersData) {
-  return Object.entries(profilersData).map(([key, profiler]) => ({
-    text: profiler.label || key,
-    state: {
-      opened: true // Open all nodes for visibility
-    },
-    children: [
-      {
-        text: 'Sources',
-        children: profiler.sources?.map(source => {
-          const sourceDetails = Object.entries(source).map(([key, detail]) => ({
-            text: `${detail.type}: ${detail.name || detail.attribute_name || ''}`
-          }));
-          return { text: `Source ${key}`, children: sourceDetails };
-        }) || []
-      },
-      {
-        text: 'Processors',
-        children: profiler.processors?.map(processor => {
-          const processorDetails = Object.entries(processor).map(([key, detail]) => ({
-            text: `${detail.type}: ${detail.storage_key || ''}, Normalize: ${detail.normalize ? 'Yes' : 'No'}`
-          }));
-          return { text: `Processor ${key}`, children: processorDetails };
-        }) || []
-      },
-      {
-        text: 'Destinations',
-        children: profiler.destinations?.map(destination => {
-          const destinationDetails = Object.entries(destination).map(([key, detail]) => ({
-            text: `${detail.type}: ${detail.target_key || ''}`
-          }));
-          return { text: `Destination ${key}`, children: destinationDetails };
-        }) || []
-      }
-    ]
-  }));
 }
 
 /**

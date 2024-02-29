@@ -10,7 +10,7 @@ function copyToClipboard() {
     text: "Log copied to clipboard.",
     icon: "success",
     button: "OK",
-});
+  });
 }
 
 function logMessage(message, type) {
@@ -18,10 +18,10 @@ function logMessage(message, type) {
   if (!textarea) return;
 
   const emojis = {
-      'info': 'ℹ️',
-      'success': '✅',
-      'warning': '⚠️',
-      'error': '❌'
+    'info': 'ℹ️',
+    'success': '✅',
+    'warning': '⚠️',
+    'error': '❌'
   };
 
   const emoji = emojis[type] || emojis['info'];
@@ -38,33 +38,49 @@ function extractProfiler(jsonData, profilerId) {
   return jsonData;
 }
 
-(function (window, ConvivialProfiler) {  
+(function (window, ConvivialProfiler) {
   document.addEventListener('DOMContentLoaded', function () {
+    const jsonTreeModal = new bootstrap.Modal(document.getElementById('jsonTreeModal'));
     const jsonData = JSON.parse(localStorage.getItem('profilersData')) || {};
     const tbody = document.querySelector('#profilersTable tbody');
 
-    Object.entries(jsonData.config.profilers).forEach(([name, profiler], index) => {
-      const row = tbody.insertRow();
-      row.innerHTML = `
-        <td>
-          <h4 class="mb-4 mt-4">Profiler: ${name}</h4>
-          <h5 class="mb-4">1) Build test data:</h5>
-          ${generateAccordion(jsonData, name, profiler.sources, 'sources-' + index)}
-        </td>
-        <td class="w-75 code-container">
-          <textarea id="testingProfiler" class="code-editor form-control" style="height: 600px;"></textarea>
-          <button onclick="copyToClipboard()" class="btn btn-secondary copy">Copy</button>
-        </td>
-    `;
+    if (Object.keys(jsonData).length > 0) {
+      Object.entries(jsonData.config.profilers).forEach(([name, profiler], index) => {
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td>
+            <h4 class="mb-4 mt-4">${profiler.label}</h4>
+            ${generateAccordion(jsonData, name, profiler.sources, 'sources-' + index)}
+          </td>
+          <td class="w-75 code-container">
+            <div id="profilersTree"></div>
+            <textarea id="testingProfiler" class="code-editor form-control" style="height: 600px;"></textarea>
+            <button onclick="copyToClipboard()" class="btn btn-secondary copy">Copy</button>
+          </td>
+      `;
+      });
+    }
+
+    // Event listener for clicks on links
+    document.getElementById('explorer').addEventListener('click', function () {
+      const jsonData = window.convivialProfiler || {}; // Adjust based on actual data structure
+      // Clear previous content
+      const container = document.getElementById('jsonTreeContainer');
+      container.innerHTML = '';
+
+      // Initialize JSON view
+      $(container).JSONView(JSON.stringify(jsonData, null, 2), { collapsed: true });
+
+      // Show the modal
+      jsonTreeModal.show();
     });
 
     // Attach click event listener to all buttons with class 'execute-profilers'
-    document.querySelectorAll('.execute-profilers').forEach(function(button) {
-      button.addEventListener('click', function(event) {
+    document.querySelectorAll('.execute-profilers').forEach(function (button) {
+      button.addEventListener('click', function (event) {
         // Prevent the default action if needed
         event.preventDefault();
         executeProfilers();
-        
       });
     });
   });
@@ -95,12 +111,12 @@ function extractProfiler(jsonData, profilerId) {
         links = data[item.example_data].map(value => {
           return `<a href="#" class="btn btn-warning btn-sm" data-profiler="${profiler_name}" data-source-type="${item.type}" data-source-name="${sourceElement}" data-example-data="${value}">${value}</a>`;
         }).join(' '); // Join links with a line break
-      
-      // Build the accordion item HTML
+
+        // Build the accordion item HTML
         accordion += `
           <div class="accordion-item">
               <h5 class="accordion-header mb-3" id="heading${collapseId}">
-                ➡️ ${sourceElement} (${item.type})
+                ➡️ ${item.type}
               </h5>
               <div id="${collapseId}" class="accordion-body mb-3">
                 ${links}
@@ -145,10 +161,10 @@ function extractProfiler(jsonData, profilerId) {
       default:
         break;
     }
-  
+
     // Call the collect method to send the updated data to the parent window.
   }
-  
+
   function createCookie(name, value) {
     try {
       document.cookie = name + "=" + value + "; expires=Fri, 31 Dec 9999 23:59:59 GMT";
@@ -181,11 +197,12 @@ function extractProfiler(jsonData, profilerId) {
 
         // Check if the query parameter exists
         if (!params.has(name)) {
-          
+
           params.set(name, value); // Set the query parameter if it doesn't exist
           var newUrl = currentUrl.toString();
           logMessage(`Query parameter ${name} added, reloading page to ${newUrl}`, 'info');
-          //iframe.location.href = newUrl; // Reload the iframe with the updated URL
+          iframe.location.href = newUrl; // Reload the iframe with the updated URL
+          location.reload(); // Reload the parent window
         }
         else {
           logMessage(`The query parameter: ${name} already exists.`, 'warning');
@@ -200,10 +217,10 @@ function extractProfiler(jsonData, profilerId) {
   }
 
   // Event listener for clicks on links
-  document.querySelector('#profilersTable').addEventListener('click', function(event) {
+  document.querySelector('#profilersTable').addEventListener('click', function (event) {
     if (event.target.matches('.btn-sm')) { // Check if the clicked element has the class 'btn-sm'
       event.preventDefault(); // Prevent default link behavior
-      
+
       // Extract data attributes
       const profilerName = event.target.getAttribute('data-profiler');
       const itemType = event.target.getAttribute('data-source-type');
@@ -216,7 +233,10 @@ function extractProfiler(jsonData, profilerId) {
   });
 
   window.testBuilder.onConfigReady = function () {
-    window.convivialProfiler = new ConvivialProfiler(window.testBuilder.convivialProfiler.config, window.testBuilder.convivialProfiler.site);
-    //window.convivialProfiler.collect();
+    let config = window.testBuilder.convivialProfiler;
+
+    if (Object.keys(config).length > 0) {
+      window.convivialProfiler = new ConvivialProfiler(config.config, config.site, config.license_key);
+    }
   };
 })(window, window.ConvivialProfiler.default);
