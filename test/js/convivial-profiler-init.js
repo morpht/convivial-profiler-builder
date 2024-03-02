@@ -38,42 +38,29 @@ function extractProfiler(jsonData, profilerId) {
   return jsonData;
 }
 
+function getAllLocalStorage() {
+  let storageObj = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key !== 'convivial_profiler' && key !== 'profilersData') {
+      storageObj[key] = localStorage.getItem(key);
+    } 
+  }
+
+  return storageObj;
+}
+
+function getAllCookies() {
+  return document.cookie.split(';').reduce((cookies, cookie) => {
+      const [name, value] = cookie.split('=').map(c => c.trim());
+      cookies[name] = decodeURIComponent(value);
+      return cookies;
+  }, {});
+}
+
 (function (window, ConvivialProfiler) {
   document.addEventListener('DOMContentLoaded', function () {
-    const jsonTreeModal = new bootstrap.Modal(document.getElementById('jsonTreeModal'));
-    const jsonData = JSON.parse(localStorage.getItem('profilersData')) || {};
-    const tbody = document.querySelector('#profilersTable tbody');
-
-    if (Object.keys(jsonData).length > 0) {
-      Object.entries(jsonData.config.profilers).forEach(([name, profiler], index) => {
-        const row = tbody.insertRow();
-        row.innerHTML = `
-          <td>
-            <h4 class="mb-4 mt-4">${profiler.label}</h4>
-            ${generateAccordion(jsonData, name, profiler.sources, 'sources-' + index)}
-          </td>
-          <td class="w-75 code-container">
-            <div id="profilersTree"></div>
-            <textarea id="testingProfiler" class="code-editor form-control" style="height: 600px;"></textarea>
-            <button onclick="copyToClipboard()" class="btn btn-secondary copy">Copy</button>
-          </td>
-      `;
-      });
-    }
-
-    // Event listener for clicks on links
-    document.getElementById('explorer').addEventListener('click', function () {
-      const jsonData = window.convivialProfiler || {}; // Adjust based on actual data structure
-      // Clear previous content
-      const container = document.getElementById('jsonTreeContainer');
-      container.innerHTML = '';
-
-      // Initialize JSON view
-      $(container).JSONView(JSON.stringify(jsonData, null, 2), { collapsed: true });
-
-      // Show the modal
-      jsonTreeModal.show();
-    });
+    refreshTree();
 
     // Attach click event listener to all buttons with class 'execute-profilers'
     document.querySelectorAll('.execute-profilers').forEach(function (button) {
@@ -83,14 +70,76 @@ function extractProfiler(jsonData, profilerId) {
         executeProfilers();
       });
     });
+
+    document.querySelectorAll('.clear-explorer-btn').forEach(function (button) {
+      button.addEventListener('click', function (event) {
+        // Prevent the default action if needed
+        event.preventDefault();
+        clearAll();
+        refreshTree();
+      });
+    });
   });
 
-  function executeProfilers() {
-    window.convivialProfiler.collect();
+  function clearAll() {
+    localStorage.clear();
+    sessionStorage.clear();
+  
+    swal({
+      title: "Cleared!",
+      text: "Profiler data in the local and session storage cleared.",
+      icon: "success",
+      button: "OK",
+    });
+  }
 
-    const jsonData = JSON.parse(localStorage.getItem('convivial_profiler')) || {};
-    const prettyJsonString = JSON.stringify(jsonData, null, 2); // 2 spaces for indentation
-    logMessage(prettyJsonString, 'info');
+  function executeProfilers() {
+    try {
+      window.convivialProfiler.collect();
+      logMessage('The profilers have run successfully. You can now inspect the "Profiler Explorer".', 'success');
+      refreshTree();
+    }
+    catch ({ name, message }) {
+      logMessage(`${name} Error during the profiler execution: ${message}`, 'error');
+    }
+  }
+
+  function refreshTree() {
+    const allLocalStorage = getAllLocalStorage();
+    const allCookies = getAllCookies();
+  
+    const dataToDisplay = {
+        localStorage: allLocalStorage,
+        cookies: allCookies
+    };
+    // Clear previous content
+    const container = document.getElementById('jsonTreeContainer');
+    container.innerHTML = '';
+  
+    // Initialize JSON view
+    $(container).JSONView(JSON.stringify(dataToDisplay, null, 2));
+    
+    const jsonData = JSON.parse(localStorage.getItem('profilersData')) || {};
+    const div = document.querySelector('#profilersTable .row .profiler-items');
+  
+    if (Object.keys(jsonData).length > 0) {
+      Object.entries(jsonData.config.profilers).forEach(([name, profiler], index) => {
+        const containsExampleData = profiler.sources.some(source => "example_data" in source);
+  
+        if (containsExampleData) {
+          // Generate the profiler section HTML
+          const profilerHTML = `
+            <div class="profiler-section">
+              <h4 class="mb-4 mt-4">${profiler.label}</h4>
+              ${generateAccordion(jsonData, name, profiler.sources, 'sources-' + index)}
+            </div>
+          `;
+  
+          // Append the profiler section to the div
+          div.innerHTML += profilerHTML;
+        }
+      });
+    }
   }
 
   // Generate the accordion HTML.
@@ -109,7 +158,7 @@ function extractProfiler(jsonData, profilerId) {
       if (item.example_data && Array.isArray(data[item.example_data])) {
         // Generate links for each value in the example_data array
         links = data[item.example_data].map(value => {
-          return `<a href="#" class="btn btn-warning btn-sm" data-profiler="${profiler_name}" data-source-type="${item.type}" data-source-name="${sourceElement}" data-example-data="${value}">${value}</a>`;
+          return `<a href="#" class="btn btn-warning btn-sm mb-1" data-profiler="${profiler_name}" data-source-type="${item.type}" data-source-name="${sourceElement}" data-example-data="${value}">${value}</a>`;
         }).join(' '); // Join links with a line break
 
         // Build the accordion item HTML
@@ -132,13 +181,10 @@ function extractProfiler(jsonData, profilerId) {
 
   // Extract the first property value from the source object.
   function extractSourceElement(source) {
-    // Create a copy of the source object without modifying the original
     let copy = { ...source };
     delete copy.type;
     delete copy.example_data;
-    // Extract the key of the first property that is not 'type' or 'example_data'
     const firstKey = Object.keys(copy).find(key => key !== 'type' && key !== 'example_data');
-    // Return the first property's value or an empty string if not found
     return copy[firstKey] || '';
   }
 

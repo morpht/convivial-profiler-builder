@@ -17,7 +17,17 @@
 
 button.copy {
   position: absolute;
-  right: 20px;
-  top: 20px;
+  top: 75px;
+  right: 25px;
   padding: 5px 10px;
+}
+
+#profilersTable .tracking {
+  right: 0;
+}
+
+.profiler-items {
+  height: 650px;
+  overflow: scroll;
+  scrollbar-color: #ffc107 #000;
 }

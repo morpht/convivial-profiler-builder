@@ -23,7 +23,7 @@
                 </symbol>
             </svg>
 
-            <div class="alert alert-primary d-flex align-items-center mb-5" role="alert">
+            <div class="alert alert-primary d-flex align-items-center mb-4" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
                     <use xlink:href="#info-fill" />
                 </svg>
@@ -33,30 +33,26 @@
                     testing process. This hands-on approach facilitates a comprehensive evaluation of each component within
                     your profiler setup. </div>
             </div>
-            <table class="table table-striped" id="profilersTable">
-                <thead>
-                    <tr>
-                        <th scope="col w-75">🧪 Testing</th>
-                        <th scope="col">💾 Log</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Dynamic rows will be added here -->
-                </tbody>
-            </table>
-            <button class="btn btn-success execute-profilers">►  Execute Profilers</button>
-            <button id="explorer" class="btn btn-info explorer-btn">✚ Explore Profilers</button>
-
-            <!-- Modal -->
-            <div class="modal fade" id="jsonTreeModal" tabindex="-1" aria-labelledby="jsonTreeModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="jsonTreeModalLabel">Profilers Explorer</h4>
-                        </div>
-                        <div class="modal-body" id="jsonTreeContainer"></div>
+            <button class="btn btn-success execute-profilers mb-4">►  Execute Profilers</button>
+            <button id="clearExplorer" class="btn btn-danger clear-explorer-btn mb-4">✖ Clear Profiler Data</button>
+            <div id="profilersTable">
+                <div class="row">
+                    <div class="profiler-items col-3">
+                        <h2>Test Data</h2>
                     </div>
-                </div>
+                    <div class="col-9 tracking row">
+                        <div class="profiler-explorer col-4">
+                            <h2>Profiler Explorer</h2>
+                            <div id="jsonTreeContainer" class="mt-4"></div>
+                        </div>
+                        <div class="col-8 code-container">
+                            <h2>Logs</h2>
+                          <div id="profilersTree" class="mt-4"></div>
+                          <textarea id="testingProfiler" class="code-editor form-control" style="height: 600px;"></textarea>
+                          <button onclick="copyToClipboard()" class="btn btn-secondary copy">Copy</button>
+                        </div>
+                    </div>
+                  </div>
             </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
