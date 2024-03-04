@@ -62,10 +62,8 @@ function getAllCookies() {
   document.addEventListener('DOMContentLoaded', function () {
     refreshTree();
 
-    // Attach click event listener to all buttons with class 'execute-profilers'
     document.querySelectorAll('.execute-profilers').forEach(function (button) {
       button.addEventListener('click', function (event) {
-        // Prevent the default action if needed
         event.preventDefault();
         executeProfilers();
       });
@@ -73,7 +71,6 @@ function getAllCookies() {
 
     document.querySelectorAll('.clear-explorer-btn').forEach(function (button) {
       button.addEventListener('click', function (event) {
-        // Prevent the default action if needed
         event.preventDefault();
         clearAll();
         refreshTree();
