@@ -6,7 +6,6 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Convivial Profiler Builder</title>
-    <!-- Load ConvivialProfiler Library. -->
     <script src="https://cdn.jsdelivr.net/gh/morpht/convivial-profiler@v0.1.34/dist/bundle.js"></script>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/json-viewer-js@1.0.8/src/style.min.css">
@@ -37,15 +36,15 @@
             <button id="clearExplorer" class="btn btn-danger clear-explorer-btn mb-4">✖ Clear Profiler Data</button>
             <div id="profilersTable">
                 <div class="row">
-                    <div class="profiler-items col-3">
+                    <div class="profiler-items col-2">
                         <h2>Test Data</h2>
                     </div>
-                    <div class="col-9 tracking row">
-                        <div class="profiler-explorer col-4">
+                    <div class="col-10 tracking row">
+                        <div class="profiler-explorer col-6">
                             <h2>Profiler Explorer</h2>
                             <div id="jsonTreeContainer" class="mt-4"></div>
                         </div>
-                        <div class="col-8 code-container">
+                        <div class="col-6 code-container">
                             <h2>Logs</h2>
                           <div id="profilersTree" class="mt-4"></div>
                           <textarea id="testingProfiler" class="code-editor form-control" style="height: 600px;"></textarea>
@@ -60,7 +59,8 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-jsonview/1.2.3/jquery.jsonview.min.js"></script>
         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-        <script src="./js/profiler.js"></script>
-        <script src="./js/convivial-profiler-init.js"></script>
+        <script src="./js/iframe_connection.js"></script>
+        <script src="./js/utilities.js"></script>
+        <script src="./js/profilers.js"></script>
     </body>
 </html>

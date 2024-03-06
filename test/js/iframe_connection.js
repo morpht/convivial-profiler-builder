@@ -1,10 +1,10 @@
-// Requesting localStorage data from parent
+// Requesting localStorage data from parent window.
 window.parent.postMessage({ action: 'getLocalStorage', key: 'profilersData' }, '*');
 window.testBuilder = {
-  onConfigReady: null, // Placeholder for a callback function
+  onConfigReady: null,
 };
 
-// Listening for reply from parent
+// Listening for reply from parent window.
 window.addEventListener('message', function (event) {
   window.testBuilder.convivialProfiler = JSON.parse(event.data.value || '{}');
   localStorage.setItem('profilersData', event.data.value);

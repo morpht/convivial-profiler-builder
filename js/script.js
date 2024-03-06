@@ -34,6 +34,12 @@ document.getElementById('profilersTable').addEventListener('click', function (ev
   }
 });
 
+window.addEventListener("message", (event) => {
+  if (event.data === "reload") {
+      window.location.reload();
+  }
+}, false);
+
 // Show the overlay
 document.getElementById('loadingOverlay').style.display = 'block';
 
