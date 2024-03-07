@@ -13,25 +13,8 @@ document.getElementById('clearProfilersData').addEventListener('click', function
   location.reload();
 });
 
-document.getElementById('showHideDetails').addEventListener('click', function () {
-  const detailButtons = document.querySelectorAll('#profilersTable .hide-show-details');
-
-  detailButtons.forEach(button => {
-    button.click();
-  });
-});
-
-// Attach event listener to the table containing the buttons
-document.getElementById('profilersTable').addEventListener('click', function (event) {
-  // Check if the clicked element has the 'hide-show-details' class
-  if (event.target && event.target.matches('.hide-show-details')) {
-    // Find the closest parent row (<tr>)
-    const parentRow = event.target.closest('tr');
-    // Toggle visibility of all .dynamic-form-cell elements within the same row
-    parentRow.querySelectorAll('.dynamic-form-cell *').forEach(cell => {
-      cell.classList.toggle('d-none'); // Using Bootstrap's 'd-none' class to hide elements
-    });
-  }
+document.getElementById('saveAll').addEventListener('click', function () {
+  //
 });
 
 window.addEventListener("message", (event) => {
@@ -151,6 +134,7 @@ async function createSelectBoxForCategory(category, cell) {
   const createSelectBoxAndFormContainer = () => {
     // Container for select and its dynamic form
     const selectFormContainer = document.createElement('div');
+    selectFormContainer.className = 'dynamic-form-container';
     cell.appendChild(selectFormContainer);
 
     let select = document.createElement('select');
@@ -197,17 +181,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addProfilerBtn = document.getElementById('addProfiler');
     if (addProfilerBtn) {
       addProfilerBtn.click();
-      await wait(300); // Ensure dynamic content has loaded
+      await wait(50); // Ensure dynamic content has loaded
     }
 
     const lastRow = document.querySelector('#profilersTable tbody tr:last-child');
+    const profilerHeader = document.querySelector('#profilersTable tbody tr:last-child .profiler-header');
+    const propfilerDetails = document.querySelector('#profilersTable tbody tr:last-child .profiler-details');
+    const dynamicForms = document.querySelectorAll('#profilersTable tbody tr:last-child .dynamic-form-cell');
+
     if (!lastRow) continue; // Skip if no row is added
 
     populateStaticFields(lastRow, properties);
 
-    await handleCategory(lastRow, 'sources', properties.sources || [], 300);
-    await handleCategory(lastRow, 'processors', properties.processors || [], 300);
-    await handleCategory(lastRow, 'destinations', properties.destinations || [], 300);
+    lastRow.addEventListener('dblclick', function () {
+      if (!this.classList.contains('loaded')) {
+        loadProfilerData(this, properties);
+      }
+      else {
+        if (dynamicForms.length >= 0) {
+          dynamicForms.forEach(cell => {
+            cell.classList.toggle('d-none');
+          });
+        }
+      }
+      
+      profilerHeader.classList.toggle('d-none');
+      propfilerDetails.classList.toggle('d-none');
+      
+      if (dynamicForms.length >= 0) {
+        dynamicForms.forEach(cell => {
+          cell.classList.toggle('invisible');
+        });
+      }
+    });
   }
 
   // Hide the overlay when done
@@ -216,8 +222,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-function loadProfilerData(profilerID) {
-  
+async function loadProfilerData(row, properties) {
+  document.getElementById('loadingOverlay').style.display = 'block';
+  await handleCategory(row, 'sources', properties.sources || [], 300);
+  await handleCategory(row, 'processors', properties.processors || [], 300);
+  await handleCategory(row, 'destinations', properties.destinations || [], 300);
+  await wait(100);
+  row.classList.add('loaded');
+  document.getElementById('loadingOverlay').style.display = 'none';
 }
 
 function addDynamicColumn(key, values) {
@@ -241,6 +253,8 @@ function addDynamicColumn(key, values) {
 }
 
 async function populateStaticFields(row, properties) {
+  const header = row.querySelector('.profiler-header');
+  header.innerHTML = properties.label;
   const inputs = {
     label: 'input[name="label"]',
     name: 'input[name="machine_name"]',
@@ -250,7 +264,7 @@ async function populateStaticFields(row, properties) {
   };
   Object.entries(inputs).forEach(([key, selector]) => {
     const input = row.querySelector(selector);
-    if (!input) return; // Skip if input does not exist
+    if (!input) return;
     if (key === 'deferred' || key === 'status') {
       input.checked = properties[key];
     } else {
@@ -282,7 +296,7 @@ async function handleCategory(row, category, items, delay) {
 
       Object.entries(item).forEach(async ([key, value]) => {
         if (key !== 'type') {
-          await wait(delay);
+          await wait(delay * 2);
           const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
           if (lastInput) {
             lastInput.value = typeof value === 'object' ? JSON.stringify(value) : value;
@@ -341,27 +355,29 @@ async function addProfiler() {
   // Properties cell (combining Label, Description, Deferred, Status)
   const propertiesCell = document.createElement('td');
   propertiesCell.innerHTML = `
-          <div class="mb-2">
-              <label>Label: <input type="text" class="form-control" name="label"></label>
-          </div>
-          <div class="mb-2">
-              <label>Machine Name: <input type="text" class="form-control" name="machine_name"></label>
-          </div>
-          <div class="mb-2">
-              <label>Description: <textarea class="form-control" name="description"></textarea></label>
-          </div>
-          <div class="form-check">
-              <label class="form-check-label">
-                  <input type="checkbox" class="form-check-input" name="deferred"> Deferred
-              </label>
-          </div>
-          <div class="form-check">
-              <label class="form-check-label">
-                  <input type="checkbox" class="form-check-input" name="status"> Status
-              </label>
-          </div>
-          <button type="button" class="hide-show-details btn btn-sm btn-info mb-1 mt-3">Show/Hide Details</button>
-      `;
+    <div class="profiler-header mb-2"></div>
+    <div class="profiler-details d-none mb-2">
+      <div class="mb-2">
+        <label>Label: <input type="text" class="form-control" name="label"></label>
+      </div>
+      <div class="mb-2">
+          <label>Machine Name: <input type="text" class="form-control" name="machine_name"></label>
+      </div>
+      <div class="mb-2">
+          <label>Description: <textarea class="form-control" name="description"></textarea></label>
+      </div>
+      <div class="form-check">
+          <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" name="deferred"> Deferred
+          </label>
+      </div>
+      <div class="form-check">
+          <label class="form-check-label">
+              <input type="checkbox" class="form-check-input" name="status"> Status
+          </label>
+      </div>
+    </div>
+`;
   row.appendChild(propertiesCell);
 
   // Existing logic to add a profiler row
@@ -369,6 +385,7 @@ async function addProfiler() {
   categories.forEach(category => {
     const cell = document.createElement('td');
     cell.classList.add('dynamic-form-cell');
+    cell.classList.add('invisible');
     cell.classList.add(`${category}-cell`);
     row.appendChild(cell);
     createSelectBoxForCategory(category, cell);
@@ -465,7 +482,6 @@ function createFormElements(formDefinition, container, category, selectedType, s
       const rowIndex = Array.from(currentRow.parentNode.children).indexOf(currentRow) + 1;
       saveOrUpdateProfilerData(rowIndex);
     });
-    //example_data.onchange = () => handleCategoryChange(select, selectFormContainer, data, cell);
   }
 }
 

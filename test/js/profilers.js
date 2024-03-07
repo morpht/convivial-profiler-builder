@@ -63,7 +63,7 @@
           var newUrl = currentUrl.toString();
           logMessage(`Query parameter ${name} added, reloading page to ${newUrl}`, 'info');
           iframe.location.href = newUrl;
-          location.reload();
+          parent.postMessage("reload", "*");
         }
         else {
           logMessage(`The query parameter: ${name} already exists.`, 'warning');

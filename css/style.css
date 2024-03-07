@@ -3,10 +3,6 @@
   background: #e8f3ff;
 }
 
-iframe {
-  border: none;
-}
-
 @keyframes rainbow-color {
   0% { border-top-color: #FF0000; } /* Red */
   14% { border-top-color: #FF7F00; } /* Orange */
@@ -45,9 +41,22 @@ iframe {
 }
 
 iframe {
+  border: none;
   height: 100%;
   width: 100%;    
   left: 0;
   top: 0;
+  position: absolute;
+}
+
+table tr {
+  cursor: pointer;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.profiler-header::after {
+  content: "Double Click to expand...";
+  left: 55%;
+  color: grey;
   position: absolute;
 }
