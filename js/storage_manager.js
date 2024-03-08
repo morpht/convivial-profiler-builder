@@ -8,6 +8,12 @@ function saveOrUpdateProfilerData(rowNum) {
     return;
   }
 
+  // Fetch and validate the current row
+  const row = document.querySelector(`#profilersTable tbody tr:nth-child(${rowNum})`);
+  if (!row || !row.classList.contains('loaded')) {
+    return;
+  }
+
   // Collect common form fields
   const siteId = document.querySelector('input[name="site-id"]').value;
   const licenseKey = document.querySelector('input[name="license-key"]').value;
@@ -26,13 +32,6 @@ function saveOrUpdateProfilerData(rowNum) {
   let profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
   if (profilersData["config"] !== undefined) {
     profilersData = profilersData["config"]["profilers"];
-  }
-
-  // Fetch and validate the current row
-  const row = document.querySelector(`#profilersTable tbody tr:nth-child(${rowNum})`);
-  if (!row) {
-    console.error('Row not found for rowNum:', rowNum);
-    return;
   }
 
   // Collect profiler specific data
