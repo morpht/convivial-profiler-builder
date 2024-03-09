@@ -1,19 +1,17 @@
-document.getElementById('loadingOverlay').style.display = 'block';
-
 /**
- * Asynchronously adds a new profiler row to the table.
- * @returns {HTMLElement} The newly created row element.
- */
-async function addProfiler() {
+* Asynchronously adds a new profiler row to the table.
+* @returns {HTMLElement} The newly created row element.
+*/
+const addProfiler = async () => {
   const tableBody = document.getElementById('profilersTable').querySelector('tbody');
   const row = document.createElement('tr');
   const rowNum = tableBody.rows.length + 1;
-
+ 
   const numberCell = document.createElement('th');
   numberCell.scope = 'row';
   numberCell.textContent = rowNum;
   row.appendChild(numberCell);
-
+ 
   const propertiesCell = document.createElement('td');
   propertiesCell.innerHTML = `
     <div class="profiler-header mb-2"></div>
@@ -38,9 +36,9 @@ async function addProfiler() {
           </label>
       </div>
     </div>
-`;
+ `;
   row.appendChild(propertiesCell);
-
+ 
   const categories = ['sources', 'processors', 'destinations'];
   categories.forEach(category => {
     const cell = document.createElement('td');
@@ -50,27 +48,27 @@ async function addProfiler() {
     row.appendChild(cell);
     createSelectBoxForCategory(category, cell);
   });
-
+ 
   tableBody.appendChild(row);
-
+ 
   attachRowEventListeners(row, rowNum);
-
+ 
   return row;
-}
-
-/**
+ };
+ 
+ /**
  * Adds a new column to the table for user-defined data properties.
  */
-function addColumn() {
+ const addColumn = () => {
   const columnName = prompt("Enter the name for the new data property:", "");
   if (columnName) {
     const headerRow = document.getElementById('tableHeaders');
     const dataRow = document.getElementById('tableRow');
-
+ 
     const newHeader = document.createElement('th');
     newHeader.textContent = columnName;
     headerRow.appendChild(newHeader);
-
+ 
     const newDataCell = document.createElement('td');
     const input = document.createElement('input');
     input.type = 'text';
@@ -80,20 +78,20 @@ function addColumn() {
     newDataCell.appendChild(input);
     dataRow.appendChild(newDataCell);
   }
-}
-
-/**
+ };
+ 
+ /**
  * Dynamically adds a new column to the table based on existing data.
  * @param {string} key The key name for the data property.
  * @param {Array|string} values The values for the data property.
  */
-function addDynamicColumn(key, values) {
+ const addDynamicColumn = (key, values) => {
   const columnName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   const headerRow = document.getElementById('tableHeaders');
   const newHeader = document.createElement('th');
   newHeader.textContent = columnName;
   headerRow.appendChild(newHeader);
-
+ 
   const dataRow = document.getElementById('tableRow');
   const newDataCell = document.createElement('td');
   const input = document.createElement('input');
@@ -103,14 +101,14 @@ function addDynamicColumn(key, values) {
   input.value = Array.isArray(values) ? values.join(',') : values;
   newDataCell.appendChild(input);
   dataRow.appendChild(newDataCell);
-}
-
-/**
+ };
+ 
+ /**
  * Populates static fields within a row based on given properties.
  * @param {HTMLElement} row The row element to populate.
  * @param {Object} properties The properties to populate the row with.
  */
-async function populateStaticFields(row, properties) {
+ const populateStaticFields = async (row, properties) => {
   const header = row.querySelector('.profiler-header');
   header.innerHTML = properties.label;
   const inputs = {
@@ -129,78 +127,89 @@ async function populateStaticFields(row, properties) {
       input.value = properties[key];
     }
   });
-}
-
-/**
+ };
+ 
+ /**
  * Attaches event listeners to all input elements within a row.
  * @param {HTMLElement} row The row element to attach event listeners to.
  * @param {number} rowNum The row number for reference in event handling.
  */
-function attachRowEventListeners(row, rowNum) {
+ const attachRowEventListeners = (row, rowNum) => {
   const inputs = row.querySelectorAll('input, textarea, select');
   inputs.forEach(input => {
     input.addEventListener('change', () => saveOrUpdateProfilerData(rowNum));
   });
-}
-
-/**
+ };
+ 
+ /**
+ * Attaches event listeners to all input elements in the settings and data tables.
+ */
+ const attachHeaderEventListeners = () => {
+  const settingsInputs = document.querySelectorAll('#settingsTable input');
+  const dataInputs = document.querySelectorAll('#dataTable input');
+ 
+  settingsInputs.forEach(input => {
+    input.addEventListener('change', () => saveOrUpdateProfilerData(1));
+  });
+ 
+  dataInputs.forEach(input => {
+    input.addEventListener('change', () => saveOrUpdateProfilerData(1));
+  });
+ };
+ 
+ /**
  * Initializes the table with profiler data from local storage.
  */
-async function initTable() {
+ const initTable = async () => {
   const storedData = JSON.parse(localStorage.getItem('profilersData')) || {};
   const profilersData = storedData.config ? storedData.config.profilers : {}; // Update for new data structure
-
+ 
   if (storedData.site) document.querySelector('input[name="site-id"]').value = storedData.site;
   if (storedData.license_key) document.querySelector('input[name="license-key"]').value = storedData.license_key;
   if (storedData.hasOwnProperty('client_cleanup')) document.querySelector('input[name="client-cleanup"]').checked = storedData.client_cleanup;
   if (storedData.hasOwnProperty('event_tracking')) document.querySelector('input[name="enable-event-tracking"]').checked = storedData.event_tracking;
-
+ 
   if (storedData.config && storedData.config.data) {
     Object.entries(storedData.config.data).forEach(([key, values]) => {
       addDynamicColumn(key, values);
     });
   }
-
+ 
   for (const [profilerName, properties] of Object.entries(profilersData)) {
     const addProfilerBtn = document.getElementById('addProfiler');
     if (addProfilerBtn) {
       addProfilerBtn.click();
       await wait(50);
     }
-
+ 
     const lastRow = document.querySelector('#profilersTable tbody tr:last-child');
     const profilerHeader = document.querySelector('#profilersTable tbody tr:last-child .profiler-header');
     const propfilerDetails = document.querySelector('#profilersTable tbody tr:last-child .profiler-details');
     const dynamicForms = document.querySelectorAll('#profilersTable tbody tr:last-child .dynamic-form-cell');
-
+ 
     if (!lastRow) continue;
-
+ 
     populateStaticFields(lastRow, properties);
-
+ 
     lastRow.addEventListener('dblclick', function () {
       if (!this.classList.contains('loaded')) {
         loadProfilerData(this, properties);
-      }
-      else {
-        if (dynamicForms.length >= 0) {
-          dynamicForms.forEach(cell => {
-            cell.classList.toggle('d-none');
-          });
-        }
-      }
-
-      profilerHeader.classList.toggle('d-none');
-      propfilerDetails.classList.toggle('d-none');
-
-      if (dynamicForms.length >= 0) {
+      } else {
         dynamicForms.forEach(cell => {
-          cell.classList.toggle('invisible');
+          cell.classList.toggle('d-none');
         });
       }
+ 
+      profilerHeader.classList.toggle('d-none');
+      propfilerDetails.classList.toggle('d-none');
+ 
+      dynamicForms.forEach(cell => {
+        cell.classList.toggle('invisible');
+      });
     });
   }
-
+ 
   // Hide the loading overlay and display the table.
   document.getElementById('loadingOverlay').style.display = 'none';
   document.body.className = 'loaded';
-}
+ };
