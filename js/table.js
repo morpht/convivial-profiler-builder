@@ -161,8 +161,8 @@ const addProfiler = async () => {
  * Initializes the table with profiler data from local storage.
  */
  const initTable = async () => {
-  const storedData = JSON.parse(localStorage.getItem('profilersData')) || {};
-  const profilersData = storedData.config ? storedData.config.profilers : {}; // Update for new data structure
+  const storedData = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  const convivialProfilerBuilder = storedData.config ? storedData.config.profilers : {}; // Update for new data structure
  
   if (storedData.site) document.querySelector('input[name="site-id"]').value = storedData.site;
   if (storedData.license_key) document.querySelector('input[name="license-key"]').value = storedData.license_key;
@@ -175,7 +175,7 @@ const addProfiler = async () => {
     });
   }
  
-  for (const [profilerName, properties] of Object.entries(profilersData)) {
+  for (const [profilerName, properties] of Object.entries(convivialProfilerBuilder)) {
     const addProfilerBtn = document.getElementById('addProfiler');
     if (addProfilerBtn) {
       addProfilerBtn.click();

@@ -29,9 +29,9 @@ const saveOrUpdateProfilerData = (rowNum) => {
   });
  
   // Load existing profiler data from local storage
-  let profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
-  if (profilersData["config"] !== undefined) {
-    profilersData = profilersData["config"]["profilers"];
+  let convivialProfilerBuilder = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  if (convivialProfilerBuilder["config"] !== undefined) {
+    convivialProfilerBuilder = convivialProfilerBuilder["config"]["profilers"];
   }
  
   // Collect profiler specific data
@@ -52,7 +52,7 @@ const saveOrUpdateProfilerData = (rowNum) => {
   };
  
   // Update local storage with new profiler data
-  profilersData[machineName] = profilerData;
+  convivialProfilerBuilder[machineName] = profilerData;
   const newSettingsAndData = {
     site: siteId,
     license_key: licenseKey,
@@ -60,11 +60,11 @@ const saveOrUpdateProfilerData = (rowNum) => {
     event_tracking: eventTracking,
     config: {
       data: dynamicDataFields,
-      profilers: profilersData
+      profilers: convivialProfilerBuilder
     }
   };
  
-  localStorage.setItem('profilersData', JSON.stringify(newSettingsAndData));
+  localStorage.setItem('convivial_profiler_builder', JSON.stringify(newSettingsAndData));
   updateTextareaContent();
  };
  
@@ -90,9 +90,9 @@ const saveOrUpdateProfilerData = (rowNum) => {
  * Populates the profiler forms from data stored in local storage.
  */
  const populateProfilersFromLocalStorage = () => {
-  const profilersData = JSON.parse(localStorage.getItem('profilersData')) || {};
-  Object.keys(profilersData).forEach(profilerKey => {
-    const profiler = profilersData[profilerKey];
+  const convivialProfilerBuilder = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  Object.keys(convivialProfilerBuilder).forEach(profilerKey => {
+    const profiler = convivialProfilerBuilder[profilerKey];
     // Call addProfilerForm for each profiler in local storage
     addProfilerForm(profiler);
   });

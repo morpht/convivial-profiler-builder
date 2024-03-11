@@ -45,14 +45,14 @@ function logMessage(message, type) {
 
 /**
  * Retrieves all key-value pairs from localStorage, excluding those related to
- * 'convivial_profiler' and 'profilersData'.
+ * 'convivial_profiler' and 'convivial_profiler_builder'.
  * @returns An object containing all the key-value pairs from localStorage.
  */
 function getAllLocalStorage() {
   let storageObj = {};
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
-    if (key !== 'convivial_profiler' && key !== 'profilersData') {
+    if (key !== 'convivial_profiler' && key !== 'convivial_profiler_builder') {
       storageObj[key] = localStorage.getItem(key);
     } 
   }
@@ -67,7 +67,9 @@ function getAllLocalStorage() {
 function getAllCookies() {
   return document.cookie.split(';').reduce((cookies, cookie) => {
     const [name, value] = cookie.split('=').map(c => c.trim());
-    cookies[name] = decodeURIComponent(value);
+    if (name != 'ConvivialProfilerClientId') {
+      cookies[name] = decodeURIComponent(value);
+    }
     return cookies;
   }, {});
 }
@@ -78,8 +80,12 @@ function getAllCookies() {
 function deleteAllCookies() {
   var cookies = document.cookie.split(';');
 
-  for (var i = 0; i < cookies.length; i++)
-  document.cookie = cookies[i] + "=;expires=" + new Date(0).toUTCString();
+  for (var i = 0; i < cookies.length; i++) {
+    if (cookies[i].includes('ConvivialProfilerClientId')) {
+      continue;
+    }
+    document.cookie = cookies[i] + "=;expires=" + new Date(0).toUTCString();
+  }
 }
 
 /**
@@ -90,7 +96,7 @@ function deleteAllCookies() {
  */
 function createCookie(name, value) {
   try {
-    document.cookie = `${name}=${value}; expires=Fri, 31 Dec 9999 23:59:59 GMT`;
+    document.cookie = `${name}=${value};path=/;expires=Fri, 31 Dec 9999 23:59:59 GMT`;
     logMessage(`Cookie with name: ${name} has been created with value ${value}`, 'success');
   } catch (error) {
     logMessage(`Error during cookie creation: ${error.message}`, 'error');

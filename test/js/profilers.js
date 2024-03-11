@@ -43,6 +43,7 @@
       const value = event.target.getAttribute('data-example-data');
  
       handleLinkClick(profilerName, itemType, sourceElement, value);
+      refreshTree();
     }
   };
  
@@ -82,6 +83,7 @@
     try {
       window.convivialProfiler.collect();
       logMessage('The profilers have run successfully. You can now inspect the "Profiler Explorer".', 'success');
+      deleteAllCookies();
       refreshTree();
     } catch ({ name, message }) {
       logMessage(`${name} Error during the profiler execution: ${message}`, 'error');
@@ -92,18 +94,24 @@
    * Refreshes the tree view displaying localStorage and cookies.
    */
   const refreshTree = () => {
+    // Get all localStorage and cookies and display them in the tree view.
     const allLocalStorage = getAllLocalStorage();
+    const containerStorage = document.getElementById('jsonTreeContainerStorage');
+    containerStorage.innerHTML = '';
+    $(containerStorage).JSONView(JSON.stringify(allLocalStorage, null, 2));
+    const storageHeading = document.createElement("h4");
+    storageHeading.innerHTML = 'Local Storage';
+    containerStorage.prepend(storageHeading);
+
     const allCookies = getAllCookies();
- 
-    const dataToDisplay = {
-      localStorage: allLocalStorage,
-      cookies: allCookies
-    };
-    const container = document.getElementById('jsonTreeContainer');
-    container.innerHTML = '';
-    $(container).JSONView(JSON.stringify(dataToDisplay, null, 2));
- 
-    const jsonData = JSON.parse(localStorage.getItem('profilersData')) || {};
+    const containerCookies = document.getElementById('jsonTreeContainerCookies');
+    containerCookies.innerHTML = '';
+    $(containerCookies).JSONView(JSON.stringify(allCookies, null, 2));
+    const cookiesHeading = document.createElement("h4");
+    cookiesHeading.innerHTML = 'Cookies';
+    containerCookies.prepend(cookiesHeading);
+
+    const jsonData = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
     const div = document.querySelector('#profilersTable .row .profiler-items');
  
     if (Object.keys(jsonData).length > 0) {

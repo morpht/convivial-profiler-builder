@@ -16,7 +16,7 @@ const defaultUrls = {
  * Updates the URLs for fetching profiler configurations based on settings from local storage.
  */
  const updateFetchURLs = () => {
-  const settings = JSON.parse(localStorage.getItem('profiler_settings')) || {};
+  const settings = JSON.parse(localStorage.getItem('convivial_profiler_builder_settings')) || {};
   urls.sources = settings.sources || defaultUrls.sources;
   urls.processors = settings.processors || defaultUrls.processors;
   urls.destinations = settings.destinations || defaultUrls.destinations;
@@ -35,11 +35,10 @@ const defaultUrls = {
     const profilerSettings = {
       sources: document.getElementById('sourceUrl').value || defaultUrls.sources,
       processors: document.getElementById('processorUrl').value || defaultUrls.processors,
-      destinations: document.getElementById('destinationUrl').value || defaultUrls.destinations,
-      import_url: document.getElementById('importUrl').value
+      destinations: document.getElementById('destinationUrl').value || defaultUrls.destinations
     };
  
-    localStorage.setItem('profiler_settings', JSON.stringify(profilerSettings));
+    localStorage.setItem('convivial_profiler_builder_settings', JSON.stringify(profilerSettings));
     updateFetchURLs();
   });
  };
@@ -48,13 +47,12 @@ const defaultUrls = {
  * Loads the profiler configuration from local storage into the form fields.
  */
  const loadConfiguration = () => {
-  const profilerSettings = JSON.parse(localStorage.getItem('profiler_settings')) || {};
-  const { sources, processors, destinations, import_url } = profilerSettings;
+  const profilerSettings = JSON.parse(localStorage.getItem('convivial_profiler_builder_settings')) || {};
+  const { sources, processors, destinations } = profilerSettings;
  
   document.getElementById('sourceUrl').value = sources || '';
   document.getElementById('processorUrl').value = processors || '';
   document.getElementById('destinationUrl').value = destinations || '';
-  document.getElementById('importUrl').value = import_url || '';
  };
  
  /**
@@ -63,7 +61,7 @@ const defaultUrls = {
  * @returns {Promise<Object|null>} The loaded YAML data as an object, or null in case of failure.
  */
  const fetchYAMLData = async (category) => {
-  const settings = JSON.parse(localStorage.getItem('profiler_settings')) || {};
+  const settings = JSON.parse(localStorage.getItem('convivial_profiler_builder_settings')) || {};
   const url = settings[category] || defaultUrls[category];
  
   try {

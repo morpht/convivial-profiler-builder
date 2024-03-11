@@ -4,24 +4,45 @@
 */
 const importJSON = () => {
   // Retrieve JSON string from textarea
-  const jsonInput = document.getElementById('jsonInput').value || '{}';
+  const jsonContent = document.getElementById('jsonContent').value || '{}';
  
   // Parse the JSON string to an object
-  const data = JSON.parse(jsonInput);
+  const data = JSON.parse(jsonContent);
  
   // Store the parsed object into local storage
-  localStorage.setItem('profilersData', JSON.stringify(data));
+  localStorage.setItem('convivial_profiler_builder', JSON.stringify(data));
  
   // Reload the page to reflect changes
   location.reload();
- };
+};
+ 
+/**
+ * Fetches JSON data from a URL and populates the input textarea with the response.
+ */
+const fetchJSON = () => {
+  const url = document.getElementById('importUrl').value;
+  if (url) {
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      const jsonContent = document.getElementById('jsonContent');
+      jsonContent.value = JSON.stringify(data, null, 2);
+    })
+    .catch(error => swal({
+      title: "Error",
+      text: `${error}`,
+      icon: "error",
+      button: "OK",
+    }));
+  } 
+}
  
  /**
  * Downloads the current profiler configuration as a JSON file.
  */
  const downloadJSON = () => {
   // Retrieve profiler configuration JSON string from textarea
-  const data = document.getElementById('jsonOutput').value || '{}';
+  const data = document.getElementById('jsonContent').value || '{}';
  
   // Create a Blob with the JSON data
   const blob = new Blob([data], { type: 'application/json' });
@@ -43,7 +64,7 @@ const importJSON = () => {
  */
  const clearProfilersData = () => {
   // Remove profiler data from local storage
-  localStorage.removeItem('profilersData');
+  localStorage.removeItem('convivial_profiler_builder');
  
   // Update the textarea content to reflect the removal
   updateTextareaContent();
@@ -57,13 +78,13 @@ const importJSON = () => {
  */
  const updateTextareaContent = () => {
   // Retrieve the textarea element for output
-  const jsonOutput = document.getElementById('jsonOutput');
+  const jsonContent = document.getElementById('jsonContent');
  
-  if (jsonOutput) {
+  if (jsonContent) {
     // Get profiler data from local storage
-    const data = localStorage.getItem('profilersData') || '{}';
+    const data = localStorage.getItem('convivial_profiler_builder') || '{}';
  
     // Format the JSON string for display
-    jsonOutput.value = JSON.stringify(JSON.parse(data), null, 2);
+    jsonContent.value = JSON.stringify(JSON.parse(data), null, 2);
   }
  };
