@@ -23,6 +23,7 @@ function clearAll() {
   sessionStorage.clear();
   deleteAllCookies();
   parent.postMessage("reload", "*");
+  parent.postMessage({ action: 'getLocalStorage', key: 'convivial_profiler_builder' }, '*');
 }
 
 /**

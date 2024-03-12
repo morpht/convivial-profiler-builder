@@ -63,8 +63,8 @@
           params.set(name, value);
           const newUrl = currentUrl.toString();
           logMessage(`Query parameter ${name} added, reloading page to ${newUrl}`, 'info');
+          parent.postMessage({ action: 'getLocalStorage', key: 'convivial_profiler_builder' }, '*');
           iframe.location.href = newUrl;
-          parent.postMessage("reload", "*");
         } else {
           logMessage(`The query parameter: ${name} already exists.`, 'warning');
         }
@@ -200,7 +200,6 @@
   // Requesting localStorage data from parent window to initialize the profiler.
   window.testBuilder.onConfigReady = () => {
     const config = window.testBuilder.convivialProfiler;
- 
     if (Object.keys(config).length > 0) {
       window.convivialProfiler = new ConvivialProfiler(config.config, config.site, config.license_key);
     }
