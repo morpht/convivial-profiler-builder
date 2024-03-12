@@ -29,3 +29,17 @@ const loadDocumentation = () => {
    })
    .catch(error => console.error('Error fetching README:', error));
 };
+
+/**
+ * Checks if a given string is a valid JSON object.
+ * @param {string} content
+ * @returns {boolean}
+ */
+function isJsonString(content) {
+  try {
+    const parsed = JSON.parse(content);
+    return typeof parsed !== 'string';
+  } catch (error) {
+    return false;
+  }
+}

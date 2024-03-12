@@ -103,6 +103,9 @@ const captureCategoryConfig = (cell) => {
             }
 
             if (input.name && value !== undefined) {
+              if (isJsonString(value)) {
+                value = JSON.parse(value);
+              }
               config[input.name] = value;
             }
           });
