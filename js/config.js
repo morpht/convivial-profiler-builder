@@ -84,33 +84,51 @@ const defaultUrls = {
  */
  const captureCategoryConfig = (cell) => {
   const configs = [];
+
   if (cell) {
     const selects = cell.querySelectorAll('select:not(.example-data-select)');
+
     selects.forEach(select => {
       const selectedType = select.value;
+
       if (selectedType) {
         const config = { type: selectedType };
         let nextSiblingContainer = select.nextSibling;
- 
+
         while (nextSiblingContainer && !nextSiblingContainer.matches('select')) {
           const inputs = nextSiblingContainer.querySelectorAll('input, textarea, select');
+
           inputs.forEach(input => {
-            const value = input.type === 'checkbox' ? input.checked : input.value;
+            let value = input.type === 'checkbox' ? input.checked : input.value;
+
+            if (input.name === 'target_location') {
+              const targetLocations = {};
+
+              Array.from(input.options).forEach(option => {
+                targetLocations[option.value] = option.selected ? option.value : "0";
+              });
+
+              value = JSON.stringify(targetLocations);
+            }
+
             if (input.name && value !== undefined) {
               config[input.name] = value;
             }
           });
- 
+
           const exampleDataSelect = nextSiblingContainer.querySelector('.example-data-select');
+
           if (exampleDataSelect && exampleDataSelect.value !== '') {
             config['example_data'] = exampleDataSelect.value;
           }
- 
+
           nextSiblingContainer = nextSiblingContainer.nextSibling;
         }
+
         configs.push(config);
       }
     });
   }
+
   return configs;
- };
+};

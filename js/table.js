@@ -118,7 +118,7 @@ const addProfiler = async () => {
     deferred: 'input[name="deferred"]',
     status: 'input[name="status"]'
   };
-  Object.entries(inputs).forEach(([key, selector]) => {
+   Object.entries(inputs).forEach(([key, selector]) => {
     const input = row.querySelector(selector);
     if (!input) return;
     if (key === 'deferred' || key === 'status') {

@@ -41,7 +41,7 @@ const createSelectBoxForCategory = async (category, cell) => {
  const handleCategory = async (row, category, items, delay) => {
   const cell = row.querySelector(`.${category}-cell`);
   if (!cell) return;
- 
+
   for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
     const item = items[itemIndex];
     const addButton = cell.querySelector('.add-another-btn');
@@ -49,24 +49,39 @@ const createSelectBoxForCategory = async (category, cell) => {
       addButton.click();
       await wait(delay);
     }
- 
+
     const selects = cell.querySelectorAll(`select[name="${category}"]`);
     const lastSelect = selects[selects.length - 1];
     if (!lastSelect) continue;
- 
+
     if (item.type) {
       lastSelect.value = item.type;
       lastSelect.dispatchEvent(new Event('change'));
       await wait(delay);
- 
+
       for (const [key, value] of Object.entries(item)) {
         if (key !== 'type') {
           await wait(delay * 2);
           const lastInput = cell.querySelector(`[name="${key}"]:last-of-type`);
           if (lastInput) {
+            if (lastInput.name === 'target_location') {
+              // Loop through all the options in the select element
+              Array.from(lastInput.options).forEach(option => {
+                // Check if the option's value is different than "0" in the value object
+                option.selected = value[option.value] !== "0";
+              });
+              
+              continue;
+            }
+
+            if (lastInput.type === 'checkbox') {
+              lastInput.checked = value;
+              continue;
+            }
+
             lastInput.value = typeof value === 'object' ? JSON.stringify(value) : value;
           }
- 
+
           if (key === 'example_data') {
             const exampleDataSelect = cell.querySelector(`select.example-data-select[data-source-index="${itemIndex}"]`);
             if (exampleDataSelect) {
@@ -77,7 +92,7 @@ const createSelectBoxForCategory = async (category, cell) => {
       }
     }
   }
- };
+};
  
  /**
  * Handles the change event of a select element by creating form elements based on the selected option.
@@ -124,7 +139,7 @@ const createSelectBoxForCategory = async (category, cell) => {
  * @param {*} value The value to set on the select element.
  * @param {string} profilerKey The key associated with the profiler configuration.
  */
- const setSelectValueAndTriggerChange = async (selectElement, value, profilerKey) => {
+const setSelectValueAndTriggerChange = async (selectElement, value, profilerKey) => {
   if (!selectElement || !value) return;
  
   if (value.length > 0 && value[0].type) {
@@ -143,7 +158,7 @@ const createSelectBoxForCategory = async (category, cell) => {
  * @param {string} selectedType The type of the selected option that triggered the form creation.
  * @param {number} sourceIndex The index of the source element within its category.
  */
- const createFormElements = (formDefinition, container, category, selectedType, sourceIndex) => {
+const createFormElements = (formDefinition, container, category, selectedType, sourceIndex) => {
   const existingDynamicElements = container.querySelectorAll('.dynamic-form-element');
   existingDynamicElements.forEach(el => el.remove());
   let lastFormGroup = '';
@@ -178,6 +193,18 @@ const createSelectBoxForCategory = async (category, cell) => {
             input.appendChild(option);
           }
         }
+        break;
+      case 'checkboxes':
+        input = document.createElement('select');
+        if (field['#options']) {
+          for (const [optionValue, optionLabel] of Object.entries(field['#options'])) {
+            const option = document.createElement('option');
+            option.value = optionValue;
+            option.textContent = optionLabel;
+            input.appendChild(option);
+          }
+        }
+        input.multiple = true;
         break;
       case 'checkbox':
         input = document.createElement('input');
@@ -273,7 +300,7 @@ const createSelectBoxForCategory = async (category, cell) => {
  * @param {Object} formData The data to populate the form elements with.
  * @param {string} profilerKey The key associated with the profiler configuration.
  */
- const populateDynamicFormElements = (container, formData, profilerKey) => {
+  const populateDynamicFormElements = (container, formData, profilerKey) => {
   Object.keys(formData).forEach(key => {
     const inputElement = container.querySelector(`[name="${key}"]`);
     if (inputElement) {
