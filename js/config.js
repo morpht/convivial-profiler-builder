@@ -38,6 +38,12 @@ const initConfiguration = () => {
 
     localStorage.setItem('convivial_profiler_builder_settings', JSON.stringify(profilerSettings));
     updateFetchURLs();
+    swal({
+      title: "Saved!",
+      text: "Schema configuration saved.",
+      icon: "success",
+      button: "OK",
+    });
   });
 };
 
@@ -47,9 +53,9 @@ const initConfiguration = () => {
 const loadConfiguration = () => {
   const profilerSettings = JSON.parse(localStorage.getItem('convivial_profiler_builder_settings')) || {};
 
-  document.getElementById('sourceUrl').value = profilerSettings.sources || '';
-  document.getElementById('processorUrl').value = profilerSettings.processors || '';
-  document.getElementById('destinationUrl').value = profilerSettings.destinations || '';
+  document.getElementById('sourceUrl').value = profilerSettings.sources || defaultUrls.sources;
+  document.getElementById('processorUrl').value = profilerSettings.processors || defaultUrls.processors;
+  document.getElementById('destinationUrl').value = profilerSettings.destinations || defaultUrls.destinations;
 };
 
 /**

@@ -24,19 +24,19 @@
             <!-- Nav tabs -->
             <ul class="mt-4 nav nav-tabs" id="tabMenu">
                 <li class="nav-item">
-                    <a class="nav-link active" id="ui-builder-tab" data-toggle="tab" href="#uiBuilder">🔧 UI Builder</a>
+                    <a class="nav-link" id="configuration-tab" data-toggle="tab" href="#configuration">⚙️ Configuration</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="export-import-tab" data-toggle="tab" href="#export-import">🔃 Export / Import</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" id="ui-builder-tab" data-toggle="tab" href="#uiBuilder">🔧 UI Builder</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="testing-tab" data-toggle="tab" href="#testing">🤖 Testing</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="documentation-tab" data-toggle="tab" href="#documentation">🕮 Documentation</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="configuration-tab" data-toggle="tab" href="#configuration">⚙️ Configuration</a>
                 </li>
             </ul>
 
@@ -45,56 +45,74 @@
                 <div class="tab-pane fade show active" id="uiBuilder" role="tabpanel" aria-labelledby="ui-builder-tab">
                     <!-- Existing UI Builder Content Here -->
                     <div class="mt-4">
-                        <h2>Settings</h2>
-                        <table class="table" id="settingsTable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Site ID</th>
-                                    <th scope="col">License Key</th>
-                                    <th scope="col">Client Cleanup</th>
-                                    <th scope="col">Enable Event tracking</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input required class="form-control" type="text" name="site-id" placeholder="Enter the site ID"></td>
-                                    <td><input required class="form-control" type="text" name="license-key" placeholder="Enter license key, eg: community"></td>
-                                    <td><input class="form-control" type="checkbox" name="client-cleanup"></td>
-                                    <td><input class="form-control" type="checkbox" name="enable-event-tracking"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <h3>Test Data</h3>
-                        <table class="table" id="dataTable">
-                        <thead>
-                            <tr id="tableHeaders">
-                            <!-- Column headers will be added here dynamically -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr id="tableRow">
-                            <!-- Column cells will be added here dynamically -->
-                            </tr>
-                        </tbody>
-                        </table>
-                        <button class="btn btn-secondary mb-5" id="addColumnBtn">Add More Test Data</button>
-                        <h2>Profilers</h2>
-                        <button id="addProfiler" class="btn btn-primary mt-3 mb-4">Add Profiler</button>
-                        <button id="clearProfilersData" class="btn btn-danger mt-3 mb-4">Clear All</button>
-                        <table class="table" id="profilersTable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Properties</th>
-                                    <th scope="col">Source(s)</th>
-                                    <th scope="col">Processor(s)</th>
-                                    <th scope="col">Destination(s)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Profilers will be added here -->
-                            </tbody> 
-                        </table>
+                        <!-- UI Builder Nav tabs -->
+                        <ul class="mt-4 nav nav-tabs mb-4" id="builderTabMenu">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="builder-settings-tab" data-toggle="tab" href="#ui-builder-settings">Settings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="builder-data-tab" data-toggle="tab" href="#ui-builder-data">Data</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="builder-profilers-tab" data-toggle="tab" href="#ui-builder-profilers">Profilers</a>
+                            </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="ui-builder-settings" role="tabpanel" aria-labelledby="builder-settings-tab">
+                                <table class="table" id="settingsTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Site ID</th>
+                                            <th scope="col">License Key</th>
+                                            <th scope="col">Client Cleanup</th>
+                                            <th scope="col">Enable Event tracking</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><input required class="form-control" type="text" name="site-id" placeholder="Enter the site ID"></td>
+                                            <td><input required class="form-control" type="text" name="license-key" placeholder="Enter license key, eg: community"></td>
+                                            <td><input class="form-control" type="checkbox" name="client-cleanup"></td>
+                                            <td><input class="form-control" type="checkbox" name="enable-event-tracking"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="tab-pane fade show active" id="ui-builder-data" role="tabpanel" aria-labelledby="builder-data-tab">
+                                <table class="table" id="dataTable">
+                                <thead>
+                                    <tr id="tableHeaders">
+                                    <!-- Column headers will be added here dynamically -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="tableRow">
+                                    <!-- Column cells will be added here dynamically -->
+                                    </tr>
+                                </tbody>
+                                </table>
+                                <button class="btn btn-secondary mb-5" id="addColumnBtn">Add more data properties</button>
+                            </div>
+                            <div class="tab-pane fade show active" id="ui-builder-profilers" role="tabpanel" aria-labelledby="builder-profilers-tab">
+                                <table class="table" id="profilersTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Properties</th>
+                                            <th scope="col">Source(s)</th>
+                                            <th scope="col">Processor(s)</th>
+                                            <th scope="col">Destination(s)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Profilers will be added here -->
+                                    </tbody> 
+                                </table>
+                                <button id="addProfiler" class="btn btn-primary mt-3 mb-4">Add Profiler</button>
+                                <button id="clearProfilersData" class="btn btn-danger mt-3 mb-4">Clear All</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="tab-pane fade" id="export-import" role="tabpanel" aria-labelledby="export-import-tab">
@@ -123,15 +141,15 @@
                     <form id="configForm" class="mt-4">
                         <div class="form-group">
                             <label for="sourceUrl">Source URL</label>
-                            <input type="text" class="form-control" id="sourceUrl" placeholder="Enter source URL">
+                            <input type="text" required class="form-control" id="sourceUrl" placeholder="Enter source URL">
                         </div>
                         <div class="form-group">
                             <label for="processorUrl">Processor URL</label>
-                            <input type="text" class="form-control" id="processorUrl" placeholder="Enter processor URL">
+                            <input type="text" required class="form-control" id="processorUrl" placeholder="Enter processor URL">
                         </div>
                         <div class="form-group">
                             <label for="destinationUrl">Destination URL</label>
-                            <input type="text" class="form-control" id="destinationUrl" placeholder="Enter destination URL">
+                            <input type="text" required class="form-control" id="destinationUrl" placeholder="Enter destination URL">
                         </div>
                         <button type="submit" class="btn btn-primary">Save Configuration</button>
                     </form>

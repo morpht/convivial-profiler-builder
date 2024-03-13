@@ -82,7 +82,7 @@
   const executeProfilers = () => {
     try {
       window.convivialProfiler.collect();
-      logMessage('The profilers have run successfully. You can now inspect the "Profiler Explorer".', 'success');
+      logMessage('The profilers have run successfully.', 'success');
       deleteAllCookies();
       refreshTree();
     } catch ({ name, message }) {
