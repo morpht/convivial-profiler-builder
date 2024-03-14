@@ -58,6 +58,11 @@ table.table tr td {
   vertical-align: middle;
 }
 
+table tr td.dynamic-form-cell,
+table tr.loaded td {
+  vertical-align: top;
+}
+
 .profiler-header::after {
   content: "Double Click to expand...";
   left: 55%;

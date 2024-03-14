@@ -107,6 +107,11 @@ const createSelectBoxForCategory = async (category, cell) => {
     const sourceIndex = Array.from(cell.querySelectorAll('select[name="' + select.name + '"]')).indexOf(select);
     createFormElements(selectedOptionData.form, container, select.name, select.value, sourceIndex);
   }
+  else {
+    if (select.nextElementSibling && select.nextElementSibling.classList.contains('dynamic-form-element')) {
+      select.nextElementSibling.remove();
+    } 
+  }
  
   const currentRow = select.closest('tr');
   const rowIndex = Array.from(currentRow.parentNode.children).indexOf(currentRow) + 1;

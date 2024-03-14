@@ -30,6 +30,7 @@ const addProfiler = async () => {
               <input type="checkbox" class="form-check-input" name="status"> Status
           </label>
       </div>
+      <button class="btn btn-sm btn-danger mt-3 remove-profiler-btn" type="button">Remove this profiler</button>
     </div>
  `;
   row.appendChild(propertiesCell);
@@ -43,17 +44,6 @@ const addProfiler = async () => {
     row.appendChild(cell);
     createSelectBoxForCategory(category, cell);
   });
-
-  const removeCell = document.createElement('th');
-  const removeButton = document.createElement('button');
-
-  removeButton.textContent = 'Remove';
-  removeButton.className = 'btn btn-sm btn-danger mb-2 mt-2 add-another-btn';
-  removeButton.type = 'button';
-  //removeButton.onclick = createSelectBoxAndFormContainer;
-  removeCell.appendChild(removeButton);
-  removeCell.scope = 'row';
-  row.appendChild(removeCell)
  
   tableBody.appendChild(row);
  

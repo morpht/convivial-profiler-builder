@@ -24,7 +24,7 @@ const saveOrUpdateProfilerData = (rowNum) => {
   const dynamicDataFields = {};
   document.querySelectorAll('#dataTable thead th').forEach((th, index) => {
     const inputName = th.textContent.toLowerCase().replace(/\s+/g, '_');
-    const inputValue = document.querySelector(`#dataTable tbody tr td:nth-child(${index + 1}) input`).value;
+    const inputValue = document.querySelector(`#dataTable tbody tr:nth-child(${index + 1}) td input`).value;
     dynamicDataFields[inputName] = inputValue.split(',').map(item => item.trim());
   });
  
@@ -40,9 +40,9 @@ const saveOrUpdateProfilerData = (rowNum) => {
  
   // Prepare profiler data for saving
   const profilerData = {
-    sources: captureCategoryConfig(row.cells[2]),
-    processors: captureCategoryConfig(row.cells[3]),
-    destinations: captureCategoryConfig(row.cells[4]),
+    sources: captureCategoryConfig(row.cells[1]),
+    processors: captureCategoryConfig(row.cells[2]),
+    destinations: captureCategoryConfig(row.cells[3]),
     label: labelValue,
     name: machineName,
     description: row.querySelector('textarea[name="description"]').value,
