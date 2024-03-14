@@ -101,9 +101,14 @@ const extractCommonFields = () => {
  */
 const extractDynamicDataFields = () => {
   const dynamicDataFields = {};
-  document.querySelectorAll('#dataTable thead th').forEach((th, index) => {
-    const inputName = th.textContent.toLowerCase().replace(/\s+/g, '_');
-    const inputValue = document.querySelector(`#dataTable tbody tr:nth-child(${index + 1}) td input`).value;
+  document.querySelectorAll('#dataTable tbody tr').forEach((tr, index) => {
+    console.log(tr);
+    const tdFirst = tr.querySelector('td:first-child');
+    console.log(tdFirst);
+
+    const inputName = tdFirst.textContent.toLowerCase().replace(/\s+/g, '_');
+    const tdLast = tr.querySelector('td:last-child');
+    const inputValue = tdLast.querySelector('input').value;
     dynamicDataFields[inputName] = inputValue.split(',').map(item => item.trim());
   });
   return dynamicDataFields;

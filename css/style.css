@@ -63,6 +63,10 @@ table tr.loaded td {
   vertical-align: top;
 }
 
+#dataTable input {
+  font-size: 1.4rem;
+}
+
 .profiler-header::after {
   content: "Double Click to expand...";
   left: 55%;
