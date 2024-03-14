@@ -1,0 +1,71 @@
+acceptlang:
+  label: HTTP Accept-Language header
+  description: Provides the language which has been set in the browser. e.g. <em>en-AU</em>
+  form:
+    key:
+      '#type': value
+      '#value': 'navigator.language'
+      '#prefix': <div>User accept language source has been taken from the "navigator.language" property from browser. See for <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/language">details</a></div>
+
+cookie:
+  label: HTTP cookie
+  description: Provides the value of a cookie by name.
+  form:
+    name:
+      '#type': textfield
+      '#title': Cookie name
+      '#description': The name of the cookie to be used as source.
+      '#required': true
+
+get:
+  label: HTTP GET request
+  description: Provides the URL of the page.
+  form:
+    resource_url:
+      '#type': textfield
+      '#title': Resource URL
+      '#description': A URL to be used as a source.
+      '#required': true
+
+httpuseragent:
+  label: HTTP User agent
+  description: Provides the user agent string.
+  form:
+    key:
+      '#type': value
+      '#value': 'navigator.userAgent'
+      '#prefix': <div>User accept parameter source has been taken from the "navigator.userAgent" property from browser. See for <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/userAgent">details</a></div>
+
+meta:
+  label: HTML meta tag
+  description: Provides a list of values in a metatag.
+  form:
+    attribute_name:
+      '#type': textfield
+      '#title': Meta attribute name
+      '#description': The metatag attribute "name" value to be used as a source.
+      '#required': true
+
+query:
+  label: URL query parameter
+  description: Provides the value of a query parameter.
+  form:
+    param:
+      '#type': textfield
+      '#title': Parameter name
+      '#description': The URL querystring parameter to be used as a source.
+      '#required': true
+
+time:
+  label: Current time
+  description: Provides the time of the user’s browser.
+  form:
+    part:
+      '#type': select
+      '#title': Part
+      '#description': The part of the current time to be used as a source.
+      '#options':
+        hour: Hours
+        minute: Minutes
+        second: Seconds
+      '#required': true
