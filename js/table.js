@@ -6,11 +6,18 @@ const addProfiler = async () => {
   const tableBody = document.getElementById('profilersTable').querySelector('tbody');
   const row = document.createElement('tr');
   const rowNum = tableBody.rows.length + 1;
+  let profilerDetailsClass = 'profiler-details mb-2';
+  let dynamicFormClass = false;
+
+  if (!document.body.classList.contains('loaded')) {
+    profilerDetailsClass += ' d-none';
+    dynamicFormClass = true;
+  }
 
   const propertiesCell = document.createElement('td');
   propertiesCell.innerHTML = `
     <div class="profiler-header mb-2"></div>
-    <div class="profiler-details d-none mb-2">
+    <div class="${profilerDetailsClass}">
       <div class="mb-2">
         <label>Label: <input type="text" class="form-control" name="label"></label>
       </div>
@@ -39,7 +46,9 @@ const addProfiler = async () => {
   categories.forEach(category => {
     const cell = document.createElement('td');
     cell.classList.add('dynamic-form-cell');
-    cell.classList.add('invisible');
+    if (dynamicFormClass) {
+      cell.classList.add('invisible');
+    }
     cell.classList.add(`${category}-cell`);
     row.appendChild(cell);
     createSelectBoxForCategory(category, cell);
