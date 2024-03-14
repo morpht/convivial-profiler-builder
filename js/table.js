@@ -6,12 +6,7 @@ const addProfiler = async () => {
   const tableBody = document.getElementById('profilersTable').querySelector('tbody');
   const row = document.createElement('tr');
   const rowNum = tableBody.rows.length + 1;
- 
-  const numberCell = document.createElement('th');
-  numberCell.scope = 'row';
-  numberCell.textContent = rowNum;
-  row.appendChild(numberCell);
- 
+
   const propertiesCell = document.createElement('td');
   propertiesCell.innerHTML = `
     <div class="profiler-header mb-2"></div>
@@ -48,6 +43,17 @@ const addProfiler = async () => {
     row.appendChild(cell);
     createSelectBoxForCategory(category, cell);
   });
+
+  const removeCell = document.createElement('th');
+  const removeButton = document.createElement('button');
+
+  removeButton.textContent = 'Remove';
+  removeButton.className = 'btn btn-sm btn-danger mb-2 mt-2 add-another-btn';
+  removeButton.type = 'button';
+  //removeButton.onclick = createSelectBoxAndFormContainer;
+  removeCell.appendChild(removeButton);
+  removeCell.scope = 'row';
+  row.appendChild(removeCell)
  
   tableBody.appendChild(row);
  
@@ -56,53 +62,86 @@ const addProfiler = async () => {
   return row;
  };
  
- /**
- * Adds a new column to the table for user-defined data properties.
- */
- const addColumn = () => {
-  const columnName = prompt("Enter the name for the new data property:", "");
-  if (columnName) {
-    const headerRow = document.getElementById('tableHeaders');
-    const dataRow = document.getElementById('tableRow');
- 
-    const newHeader = document.createElement('th');
-    newHeader.textContent = columnName;
-    headerRow.appendChild(newHeader);
- 
-    const newDataCell = document.createElement('td');
+  /**
+   * Adds a new column to the table for user-defined data properties.
+   */
+  const addColumn = () => {
+    const columnName = prompt("Enter the name for the new data property:", "");
+    if (columnName) {
+      const key = columnName.toLowerCase().replace(/\s+/g, '_');
+      const dataRow = createDataRow(columnName, key);
+      const table = document.getElementById('dataTable');
+      table.appendChild(dataRow);
+    }
+  };
+
+  /**
+   * Creates a new data row element for the table.
+   * @param {string} columnName The name of the column.
+   * @param {string} key The key name for the data property.
+   * @returns {HTMLElement} The created data row element.
+   */
+  const createDataRow = (columnName, key) => {
+    const dataRow = document.createElement('tr');
+
+    const labelDataCell = createLabelDataCell(columnName);
+    dataRow.appendChild(labelDataCell);
+
+    const dataCell = createDataCell(key);
+    dataRow.appendChild(dataCell);
+
+    return dataRow;
+  };
+
+  /**
+   * Creates a new label data cell element.
+   * @param {string} columnName The name of the column.
+   * @returns {HTMLElement} The created label data cell element.
+   */
+  const createLabelDataCell = (columnName) => {
+    const labelDataCell = document.createElement('td');
+    labelDataCell.textContent = columnName;
+    labelDataCell.scope = 'row';
+    labelDataCell.className = 'col-1';
+    return labelDataCell;
+  };
+
+  /**
+   * Creates a new data cell element with an input field.
+   * @param {string} key The key name for the data property.
+   * @returns {HTMLElement} The created data cell element.
+   */
+  const createDataCell = (key) => {
+    const dataCell = document.createElement('td');
+    dataCell.scope = 'row';
+    dataCell.className = 'col-11';
+
     const input = document.createElement('input');
     input.type = 'text';
-    input.placeholder = 'Enter values separated by comma for ' + columnName.toLowerCase().replace(/\s+/g, '_') + '...';
-    input.setAttribute('name', columnName.toLowerCase().replace(/\s+/g, '_'));
+    input.placeholder = `Enter values separated by comma for ${key}...`;
+    input.setAttribute('name', key);
     input.className = 'form-control mb-2 mt-2';
-    newDataCell.appendChild(input);
-    dataRow.appendChild(newDataCell);
-  }
- };
- 
- /**
- * Dynamically adds a new column to the table based on existing data.
- * @param {string} key The key name for the data property.
- * @param {Array|string} values The values for the data property.
- */
- const addDynamicColumn = (key, values) => {
-  const columnName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-  const headerRow = document.getElementById('tableHeaders');
-  const newHeader = document.createElement('th');
-  newHeader.textContent = columnName;
-  headerRow.appendChild(newHeader);
- 
-  const dataRow = document.getElementById('tableRow');
-  const newDataCell = document.createElement('td');
-  const input = document.createElement('input');
-  input.type = 'text';
-  input.setAttribute('name', key);
-  input.className = 'form-control mb-2 mt-2';
-  input.value = Array.isArray(values) ? values.join(',') : values;
-  newDataCell.appendChild(input);
-  dataRow.appendChild(newDataCell);
- };
- 
+
+    dataCell.appendChild(input);
+    return dataCell;
+  };
+
+  /**
+   * Dynamically adds a new column to the table based on existing data.
+   * @param {string} key The key name for the data property.
+   * @param {Array|string} values The values for the data property.
+   */
+  const addDynamicColumn = (key, values) => {
+    const columnName = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const dataRow = createDataRow(columnName, key);
+
+    const input = dataRow.querySelector('input');
+    input.value = Array.isArray(values) ? values.join(',') : values;
+
+    const tableRow = document.getElementById('tableRow');
+    tableRow.appendChild(dataRow);
+  };
+
  /**
  * Populates static fields within a row based on given properties.
  * @param {HTMLElement} row The row element to populate.

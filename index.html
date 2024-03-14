@@ -80,17 +80,14 @@
                                 </table>
                             </div>
                             <div class="tab-pane fade show active" id="ui-builder-data" role="tabpanel" aria-labelledby="builder-data-tab">
-                                <table class="table" id="dataTable">
+                                <table class="table table-striped" id="dataTable">
                                 <thead>
                                     <tr id="tableHeaders">
-                                    <!-- Column headers will be added here dynamically -->
+                                        <th scope="col col-1">Property</th>
+                                        <th scope="col col-11">Test Data</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr id="tableRow">
-                                    <!-- Column cells will be added here dynamically -->
-                                    </tr>
-                                </tbody>
+                                <tbody id="tableRow"></tbody>
                                 </table>
                                 <button class="btn btn-secondary mb-5" id="addColumnBtn">Add more data properties</button>
                             </div>
@@ -98,11 +95,11 @@
                                 <table class="table" id="profilersTable">
                                     <thead>
                                         <tr>
-                                            <th scope="col">#</th>
                                             <th scope="col">Properties</th>
                                             <th scope="col">Source(s)</th>
                                             <th scope="col">Processor(s)</th>
                                             <th scope="col">Destination(s)</th>
+                                            <th scope="col">Operations</th>
                                         </tr>
                                     </thead>
                                     <tbody>
