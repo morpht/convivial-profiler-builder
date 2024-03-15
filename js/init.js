@@ -1,17 +1,24 @@
 /**
-* Initializes the application once the DOM content has fully loaded.
-*/
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the configuration settings for the application.
+ * Initializes the application once the DOM content has fully loaded.
+ */
+document.addEventListener('DOMContentLoaded', initializeApplication);
+
+/**
+ * Initializes the application.
+ */
+function initializeApplication() {
   initConfiguration();
- 
-  // Initialize the table with dynamic functionalities.
   initTable();
- });
- 
- /**
+  setupEventListeners();
+  checkConfigUrlParameter();
+}
+
+/**
  * Sets up event listeners for various buttons on the page.
  */
- document.getElementById('addColumnBtn').addEventListener('click', addColumn);
- document.getElementById('addProfiler').addEventListener('click', addProfiler);
- document.getElementById('clearProfilersData').addEventListener('click', clearProfilersData);
+function setupEventListeners() {
+  document.getElementById('addColumnBtn').addEventListener('click', addColumn);
+  document.getElementById('addProfiler').addEventListener('click', addProfiler);
+  document.getElementById('clearProfilersData').addEventListener('click', clearProfilersData);
+}
+

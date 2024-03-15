@@ -26,3 +26,17 @@ function isJsonString(content) {
     return false;
   }
 }
+
+/**
+ * Validates if a given string is a valid URL.
+ * @param {string} url - The string to validate as a URL.
+ * @returns {boolean} - True if the string is a valid URL, false otherwise.
+ */
+function isValidUrl(url) {
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
