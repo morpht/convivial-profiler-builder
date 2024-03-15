@@ -34,7 +34,7 @@ const addProfiler = async () => {
       </div>
       <div class="form-check">
           <label class="form-check-label">
-              <input type="checkbox" class="form-check-input" name="status"> Status
+              <input type="checkbox" class="form-check-input" name="status"> Enabled
           </label>
       </div>
       <button class="btn btn-sm btn-danger mt-3 remove-profiler-btn" type="button">Remove this profiler</button>

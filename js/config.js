@@ -2,9 +2,9 @@
  * Default URLs for the Convivial Profiler's sources, processors, and destinations.
  */
 const defaultUrls = {
-  sources: 'https://raw.githubusercontent.com/morpht/convivial-profiler-builder/main/schema/convivial_profiler.profiler_source.yml',
-  processors: 'https://raw.githubusercontent.com/morpht/convivial-profiler-builder/main/schema/convivial_profiler.profiler_processor.yml',
-  destinations: 'https://raw.githubusercontent.com/morpht/convivial-profiler-builder/main/schema/convivial_profiler.profiler_destination.yml'
+  sources: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_source.yml',
+  processors: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_processor.yml',
+  destinations: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_destination.yml'
 };
 
 /**

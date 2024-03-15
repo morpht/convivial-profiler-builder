@@ -5,9 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize the configuration settings for the application.
   initConfiguration();
  
-  // Load the documentation content from an external source.
-  loadDocumentation();
- 
   // Initialize the table with dynamic functionalities.
   initTable();
  });

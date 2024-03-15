@@ -14,23 +14,6 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const generateMachineName = (label) => label.toLowerCase().replace(/\s+/g, '_');
 
 /**
-* Loads and displays markdown documentation from a remote URL.
-* Uses the 'marked' library to parse markdown into HTML.
-*/
-const loadDocumentation = () => {
- fetch('https://raw.githubusercontent.com/morpht/convivial-profiler/main/README.md')
-   .then(response => {
-     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-     return response.text();
-   })
-   .then(markdown => {
-     const htmlContent = marked.parse(markdown);
-     document.getElementById('documentation-content').innerHTML = htmlContent;
-   })
-   .catch(error => console.error('Error fetching README:', error));
-};
-
-/**
  * Checks if a given string is a valid JSON object.
  * @param {string} content
  * @returns {boolean}

@@ -73,3 +73,7 @@ table tr.loaded td {
   color: grey;
   position: absolute;
 }
+
+nav span.site-name {
+  vertical-align: middle  ;
+}
