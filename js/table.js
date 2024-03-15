@@ -1,19 +1,57 @@
 /**
-* Asynchronously adds a new profiler row to the table.
-* @returns {HTMLElement} The newly created row element.
-*/
+ * Asynchronously adds a new profiler row to the table.
+ * @returns {HTMLElement} The newly created row element.
+ */
 const addProfiler = async () => {
   const tableBody = document.getElementById('profilersTable').querySelector('tbody');
-  const row = document.createElement('tr');
   const rowNum = tableBody.rows.length + 1;
+  const row = createProfilerRow(rowNum);
+  tableBody.appendChild(row);
+  attachRowEventListeners(row, rowNum);
+  toggleProfilerHeader(row);
+  return row;
+};
+
+/**
+ * Creates a new profiler row element.
+ * @param {number} rowNum The row number.
+ * @returns {HTMLElement} The created profiler row element.
+ */
+const createProfilerRow = (rowNum) => {
+  const row = document.createElement('tr');
+  const profilerDetailsClass = getProfilerDetailsClass();
+  const dynamicFormClass = !isPageFullyLoaded();
+
+  const propertiesCell = createPropertiesCell(profilerDetailsClass);
+  row.appendChild(propertiesCell);
+
+  const categories = ['sources', 'processors', 'destinations'];
+  categories.forEach(category => {
+    const cell = createCategoryCell(category, dynamicFormClass);
+    row.appendChild(cell);
+  });
+
+  return row;
+};
+
+/**
+ * Determines the class name for the profiler details section.
+ * @returns {string} The class name for the profiler details section.
+ */
+const getProfilerDetailsClass = () => {
   let profilerDetailsClass = 'profiler-details mb-2';
-  let dynamicFormClass = false;
-
-  if (!document.body.classList.contains('loaded')) {
+  if (!isPageFullyLoaded()) {
     profilerDetailsClass += ' d-none';
-    dynamicFormClass = true;
   }
+  return profilerDetailsClass;
+};
 
+/**
+ * Creates a new properties cell element.
+ * @param {string} profilerDetailsClass The class name for the profiler details section.
+ * @returns {HTMLElement} The created properties cell element.
+ */
+const createPropertiesCell = (profilerDetailsClass) => {
   const propertiesCell = document.createElement('td');
   propertiesCell.innerHTML = `
     <div class="profiler-header mb-2"></div>
@@ -22,43 +60,53 @@ const addProfiler = async () => {
         <label>Label: <input type="text" class="form-control" name="label"></label>
       </div>
       <div class="mb-2">
-          <label>Machine Name: <input type="text" class="form-control" name="machine_name"></label>
+        <label>Machine Name: <input type="text" class="form-control" name="machine_name"></label>
       </div>
       <div class="mb-2">
-          <label>Description: <textarea class="form-control" name="description"></textarea></label>
+        <label>Description: <textarea class="form-control" name="description"></textarea></label>
       </div>
       <div class="form-check">
-          <label class="form-check-label">
-              <input type="checkbox" class="form-check-input" name="deferred"> Deferred
-          </label>
+        <label class="form-check-label">
+          <input type="checkbox" class="form-check-input" name="deferred"> Deferred
+        </label>
       </div>
       <div class="form-check">
-          <label class="form-check-label">
-              <input type="checkbox" class="form-check-input" name="status"> Enabled
-          </label>
+        <label class="form-check-label">
+          <input type="checkbox" class="form-check-input" name="status"> Enabled
+        </label>
       </div>
       <button class="btn btn-sm btn-danger mt-3 remove-profiler-btn" type="button">Remove this profiler</button>
     </div>
- `;
-  row.appendChild(propertiesCell);
+  `;
+  return propertiesCell;
+};
 
-  const categories = ['sources', 'processors', 'destinations'];
-  categories.forEach(category => {
-    const cell = document.createElement('td');
-    cell.classList.add('dynamic-form-cell');
-    if (dynamicFormClass) {
-      cell.classList.add('invisible');
-    }
-    cell.classList.add(`${category}-cell`);
-    row.appendChild(cell);
-    createSelectBoxForCategory(category, cell);
-  });
+/**
+ * Creates a new category cell element.
+ * @param {string} category The category name.
+ * @param {boolean} dynamicFormClass True if the dynamic form class is needed, false otherwise.
+ * @returns {HTMLElement} The created category cell element.
+ */
+const createCategoryCell = (category, dynamicFormClass) => {
+  const cell = document.createElement('td');
+  cell.classList.add('dynamic-form-cell');
+  if (dynamicFormClass) {
+    cell.classList.add('invisible');
+  }
+  cell.classList.add(`${category}-cell`);
+  createSelectBoxForCategory(category, cell);
+  return cell;
+};
 
-  tableBody.appendChild(row);
-
-  attachRowEventListeners(row, rowNum);
-
-  return row;
+/**
+ * Toggles the visibility of the profiler header.
+ * @param {HTMLElement} row The profiler row element.
+ */
+const toggleProfilerHeader = (row) => {
+  if (isPageFullyLoaded()) {
+    const profilerHeader = row.querySelector('.profiler-header');
+    profilerHeader.classList.toggle('d-none');
+  }
 };
 
 /**

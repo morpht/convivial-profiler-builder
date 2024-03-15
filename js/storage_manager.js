@@ -60,14 +60,6 @@ const removeProfiler = (rowNum) => {
 };
 
 /**
- * Checks if the page is fully loaded.
- * @returns {boolean} - True if the page is fully loaded, false otherwise.
- */
-const isPageFullyLoaded = () => {
-  return document.body.classList.contains('loaded');
-};
-
-/**
  * Retrieves the profiler row element based on the row number.
  * @param {number} rowNum - The row number of the profiler.
  * @returns {HTMLElement|null} - The profiler row element if found and loaded, null otherwise.

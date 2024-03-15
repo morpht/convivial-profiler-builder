@@ -40,3 +40,11 @@ function isValidUrl(url) {
     return false;
   }
 }
+
+/**
+ * Checks if the page is fully loaded.
+ * @returns {boolean} - True if the page is fully loaded, false otherwise.
+ */
+const isPageFullyLoaded = () => {
+  return document.body.classList.contains('loaded');
+};
