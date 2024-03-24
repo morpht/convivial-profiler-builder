@@ -167,10 +167,53 @@ const createDataCell = (key) => {
   input.type = 'text';
   input.placeholder = `Enter values separated by comma for ${key}...`;
   input.setAttribute('name', key);
-  input.className = 'form-control mb-2 mt-2';
-
+  input.className = 'd-none';
   dataCell.appendChild(input);
+
+  const addButton = document.createElement('button');
+  addButton.textContent = `Add ${key} test`;
+  addButton.className = 'btn btn-sm btn-secondary add-data-btn mb-3';
+  addButton.type = 'button';
+  addButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    addTestData(key);
+  });
+  dataCell.appendChild(addButton);
+
+  const dataValues = document.createElement('div');
+  dataValues.className = 'data-values';
+  dataCell.appendChild(dataValues);
+
+  // Update data values when input value changes
+  input.addEventListener('change', () => {
+    const dataValuesElement = dataCell.querySelector('.data-values');
+    dataValuesElement.innerHTML = dataElements(input.value);
+  });
+
   return dataCell;
+};
+
+/**
+ * Adds a new column to the table for user-defined data properties.
+ */
+const addTestData = (key) => {
+  const testData = prompt("Enter the test data value:", "");
+  if (testData) {
+    const element = document.querySelector('input[name="' + key + '"]');
+    element.value += ',' + testData;
+    element.dispatchEvent(new Event('change'));
+  }
+};
+
+/**
+ * Converts comma-separated values into HTML <span> elements.
+ * @param {string} values The comma-separated values.
+ * @returns {string} The HTML <span> elements.
+ */
+const dataElements = (values) => {
+  const elements = values.split(',').map((value) => value.trim());
+  const htmlElements = elements.map((element) => `<span>${element}</span>`);
+  return htmlElements.join('');
 };
 
 /**
@@ -184,6 +227,7 @@ const addDynamicColumn = (key, values) => {
 
   const input = dataRow.querySelector('input');
   input.value = Array.isArray(values) ? values.join(',') : values;
+  input.dispatchEvent(new Event('change'));
 
   const tableRow = document.getElementById('tableRow');
   tableRow.appendChild(dataRow);

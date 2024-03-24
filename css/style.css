@@ -63,10 +63,6 @@ table tr.loaded td {
   vertical-align: top;
 }
 
-#dataTable input {
-  font-size: 1.4rem;
-}
-
 .profiler-header::after {
   content: "Double Click to expand...";
   left: 55%;
@@ -76,4 +72,12 @@ table tr.loaded td {
 
 nav span.site-name {
   vertical-align: middle  ;
+}
+
+.data-values {
+  list-style-position: inside;
+}
+
+.data-values span {
+  display: list-item;
 }

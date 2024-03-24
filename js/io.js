@@ -121,9 +121,7 @@ async function checkConfigUrlParameter() {
     
     try {
       await fetchJSON();
-      console.log('before');
       importJSON();
-      console.log('after');
     } catch (error) {
       console.error('Error fetching JSON:', error);
     }

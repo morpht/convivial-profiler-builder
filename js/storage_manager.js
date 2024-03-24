@@ -94,9 +94,7 @@ const extractCommonFields = () => {
 const extractDynamicDataFields = () => {
   const dynamicDataFields = {};
   document.querySelectorAll('#dataTable tbody tr').forEach((tr, index) => {
-    console.log(tr);
     const tdFirst = tr.querySelector('td:first-child');
-    console.log(tdFirst);
 
     const inputName = tdFirst.textContent.toLowerCase().replace(/\s+/g, '_');
     const tdLast = tr.querySelector('td:last-child');
