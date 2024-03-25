@@ -200,7 +200,7 @@
   // Requesting localStorage data from parent window to initialize the profiler.
   window.testBuilder.onConfigReady = () => {
     const config = window.testBuilder.convivialProfiler;
-    if (Object.keys(config).length > 0) {
+    if (config && Object.keys(config).length > 0) {
       window.convivialProfiler = new ConvivialProfiler(config.config, config.site, config.license_key);
     }
   };

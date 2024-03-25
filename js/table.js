@@ -212,7 +212,9 @@ const addTestData = (key) => {
  */
 const dataElements = (values) => {
   const elements = values.split(',').map((value) => value.trim());
-  const htmlElements = elements.map((element) => `<span>${element}</span>`);
+  const htmlElements = elements
+    .filter((element) => element !== '')
+    .map((element) => `<span>${element}</span>`);
   return htmlElements.join('');
 };
 
