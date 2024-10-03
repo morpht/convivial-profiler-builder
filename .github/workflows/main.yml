@@ -1,0 +1,41 @@
+name: Run Cypress Tests
+on:
+  schedule:
+    # Weekdays at 22:00 UTC (Monday to Friday 8 am AEST).
+    - cron: '0 22 * * 1-5'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+jobs:
+  full:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || !github.event.pull_request.draft }}
+    name: Full (Build, Validate, Test)
+    runs-on: ubuntu-latest
+    env:
+      NPM_CACHE: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Prepare environment variables
+        run: |
+          which node
+          node --version
+          cp cypress.env.default.json cypress.env.json
+      - name: Install dependencies
+        run: |
+          npm install
+          npm list
+      - name: Start http Server
+        run: npm run start&
+      - name: Run Cypress Tests
+        run: npx cypress run

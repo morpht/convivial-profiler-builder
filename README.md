@@ -1,5 +1,7 @@
 # Convivial Profiler Builder
 
+[![Continous Integration](https://github.com/morpht/convivial-profiler-builder/actions/workflows/main.yml/badge.svg)](https://github.com/morpht/convivial-profiler-builder/actions?query=branch%3Amain)
+
 The Profiler Builder is a web application designed for creating, managing, and exporting profiler configurations. It allows users to dynamically build profiler setups by specifying sources, processors, and destinations, and then export these configurations as JSON. Additionally, it provides functionality to import profiler configurations and visualize them in a tree structure for easy inspection.
 
 ## Features

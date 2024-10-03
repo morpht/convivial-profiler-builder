@@ -1,0 +1,41 @@
+{
+  "name": "convivial-profiler-builder",
+  "version": "0.0.0",
+  "description": "The Profiler Builder is a web application designed for creating, managing, and exporting profiler configurations.",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server ./ -p 8081 -a localhost",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "keywords": [],
+  "author": "Morpht <murray@morpht.com> (https://www.morpht.com)",
+  "license": "UNLICENSED",
+  "private": true,
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "cypress": "^13.6.4",
+    "cypress-localstorage-commands": "^2.2.5",
+    "http-server": "^14.1.1",
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "engines": {
+    "npm": ">=10.1.0 <11.0.0",
+    "node": ">=20.9.0 <21.0.0"
+  },
+  "browserslist": [
+    "> 0.2%",
+    "not dead"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/morpht/convivial-profiler-builder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/morpht/convivial-profiler-builder/issues"
+  },
+  "homepage": "https://github.com/morpht/convivial-profiler-builder#readme"
+}

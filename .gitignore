@@ -1,0 +1,14 @@
+# Node.
+node_modules
+
+# Software.
+.idea
+
+# Mac.
+.DS_Store
+
+#Cypress directories.
+cypress/videos/
+cypress/screenshots
+cypress/downloads
+cypress.env.json
