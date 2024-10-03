@@ -1,14 +1,18 @@
-// Test for Convivial Profiler Builder Configuration Tab
 describe('Convivial Profiler Builder: Test - Application', () => {
-  it('1. Configuration Tab - Save configuration form, check popup message, click Okay, and verify local storage.', () => {
-    // Open the homepage.
+  beforeEach(() => {
+    // Open the homepage before each test
     cy.visit(Cypress.env('baseUrl'));
+  });
+
+  it('Configuration Tab - Save configuration form, check popup message, click Okay, and verify local storage.', () => {
+    // Flush local storage.
+    cy.clearLocalStorage();
 
     // Check the local storage variable 'convivial_profiler_builder_settings' does not exist.
     cy.getLocalStorage('convivial_profiler_builder_settings')
       .then($convivial_profiler_builder_settings => {
-        expect($convivial_profiler_builder_settings).to.equal(null)
-      })
+        expect($convivial_profiler_builder_settings).to.equal(null);
+      });
 
     // Go to Configuration tab.
     cy.get('#configuration-tab').click();
@@ -31,7 +35,7 @@ describe('Convivial Profiler Builder: Test - Application', () => {
     cy.get('.swal-modal .swal-button-container .swal-button--confirm')
       .click();
 
-    // Check the local storage variable 'convivial_profiler_builder_settings'
+    // Check the local storage variable 'convivial_profiler_builder_settings'.
     cy.getLocalStorage('convivial_profiler_builder_settings').then((value) => {
       const expectedValue = {
         sources: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_source.yml',
@@ -39,15 +43,12 @@ describe('Convivial Profiler Builder: Test - Application', () => {
         destinations: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_destination.yml'
       };
 
-      // Assert that the local storage value matches the expected value
+      // Assert that the local storage value matches the expected value.
       expect(JSON.parse(value)).to.deep.equal(expectedValue);
     });
+  });
 
-  })
-  it('2. UI Builder Tab - Save UI Builder form.', () => {
-    // Open the homepage.
-    cy.visit(Cypress.env('baseUrl'));
-
+  it('UI Builder Tab - Save UI Builder form.', () => {
     // Go to UI Builder tab.
     cy.get('#builder-settings-tab').click();
 
@@ -67,6 +68,5 @@ describe('Convivial Profiler Builder: Test - Application', () => {
 
     // There are no profilers.
     cy.get('#profilersTable tbody').find('tr').should('have.length', 0);
-
-  })
+  });
 });
