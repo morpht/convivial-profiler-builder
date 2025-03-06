@@ -38,9 +38,9 @@ describe('Convivial Profiler Builder: Test - Application', () => {
     // Check the local storage variable 'convivial_profiler_builder_settings'.
     cy.getLocalStorage('convivial_profiler_builder_settings').then((value) => {
       const expectedValue = {
-        sources: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_source.yml',
-        processors: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_processor.yml',
-        destinations: 'https://raw.githubusercontent.com/eleonel/Convivial-Profiler/1.0.x/convivial_profiler.profiler_destination.yml'
+        sources: 'https://raw.githubusercontent.com/morpht/convivial_profiler/1.0.x/convivial_profiler.profiler_source.yml',
+        processors: 'https://raw.githubusercontent.com/morpht/convivial_profiler/1.0.x/convivial_profiler.profiler_processor.yml',
+        destinations: 'https://raw.githubusercontent.com/morpht/convivial_profiler/1.0.x/convivial_profiler.profiler_destination.yml'
       };
 
       // Assert that the local storage value matches the expected value.
