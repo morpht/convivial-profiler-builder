@@ -111,7 +111,15 @@
     cookiesHeading.innerHTML = 'Cookies';
     containerCookies.prepend(cookiesHeading);
 
-    const jsonData = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+    const jsonData = (() => {
+      try {
+        const data = localStorage.getItem('convivial_profiler_builder');
+        return data && data !== 'undefined' && data !== 'null' ? JSON.parse(data) : {};
+      } catch (error) {
+        console.warn('Failed to parse localStorage data:', error);
+        return {};
+      }
+    })();
     const div = document.querySelector('#profilersTable .row .profiler-items');
  
     if (Object.keys(jsonData).length > 0) {

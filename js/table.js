@@ -306,7 +306,21 @@ const attachHeaderEventListeners = () => {
 * Initializes the table with profiler data from local storage.
 */
 const initTable = async () => {
-  const storedData = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  const rawData = localStorage.getItem('convivial_profiler_builder');
+  if (!rawData || rawData === 'undefined' || rawData === 'null' || rawData === '{}') {
+    console.log('No valid profiler data found, skipping initialization');
+    document.body.className = 'loaded';
+    return;
+  }
+
+  let storedData;
+  try {
+    storedData = JSON.parse(rawData);
+  } catch (error) {
+    console.warn('Invalid JSON in localStorage, skipping initialization');
+    document.body.className = 'loaded';
+    return;
+  }
   const convivialProfilerBuilder = storedData.config ? storedData.config.profilers : {}; // Update for new data structure
 
   if (storedData.site) document.querySelector('input[name="site-id"]').value = storedData.site;
