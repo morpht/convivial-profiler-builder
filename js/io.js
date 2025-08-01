@@ -5,12 +5,14 @@
 const importJSON = () => {
   // Retrieve JSON string from textarea
   const jsonContent = document.getElementById('jsonContent').value || '{}';
-  
+  console.log('Importing JSON:', jsonContent);
   // Parse the JSON string to an object
   const data = JSON.parse(jsonContent);
   
+  console.log('Parsed JSON data:', data);
   // Store the parsed object into local storage
   localStorage.setItem('convivial_profiler_builder', JSON.stringify(data));
+  console.log('Data stored in local storage:', localStorage.getItem('convivial_profiler_builder'));
   
   // Remove the "config" query parameter from the URL
   removeConfigUrlParameter();
@@ -96,14 +98,22 @@ const clearProfilersData = () => {
  * Updates the content of the textarea with the current profiler configuration from local storage.
  */
 const updateTextareaContent = () => {
-  // Retrieve the textarea element for output
   const jsonContent = document.getElementById('jsonContent');
   if (jsonContent) {
-    // Get profiler data from local storage
-    const data = localStorage.getItem('convivial_profiler_builder') || '{}';
+    const rawData = localStorage.getItem('convivial_profiler_builder');
     
-    // Format the JSON string for display
-    jsonContent.value = JSON.stringify(JSON.parse(data), null, 2);
+    if (!rawData || rawData === 'undefined' || rawData === 'null') {
+      jsonContent.value = '{}';
+      return;
+    }
+    
+    try {
+      const data = JSON.parse(rawData);
+      jsonContent.value = JSON.stringify(data, null, 2);
+    } catch (error) {
+      console.warn('Invalid JSON in localStorage, showing empty object');
+      jsonContent.value = '{}';
+    }
   }
 };
 
