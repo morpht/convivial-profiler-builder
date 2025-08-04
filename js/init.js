@@ -11,6 +11,7 @@ function initializeApplication() {
   initTable();
   setupEventListeners();
   checkConfigUrlParameter();
+  updateTextareaContent();
 }
 
 /**

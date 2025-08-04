@@ -244,9 +244,6 @@
       console.log('ConvivialProfiler not initialized, skipping auto-execution');
       return;
     }
-    
-    // Everything looks good, execute profilers
-    console.log('Auto-executing profilers on page load');
-    executeProfilers();
+
   }, 500); // 500ms delay to ensure iframe communication is complete
 });
