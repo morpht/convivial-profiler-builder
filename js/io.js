@@ -6,13 +6,29 @@ const importJSON = () => {
   // Retrieve JSON string from textarea
   const jsonContent = document.getElementById('jsonContent').value || '{}';
   console.log('Importing JSON:', jsonContent);
-  // Parse the JSON string to an object
-  const data = JSON.parse(jsonContent);
+  
+  // Parse the JSON string to an object with safe parsing
+  let data;
+  try {
+    data = JSON.parse(jsonContent);
+  } catch (error) {
+    console.error('JSON parse error:', error);
+    swal({
+      title: "Error",
+      text: "Invalid JSON format",
+      icon: "error",
+      button: "OK",
+    });
+    return;
+  }
   
   console.log('Parsed JSON data:', data);
   // Store the parsed object into local storage
   localStorage.setItem('convivial_profiler_builder', JSON.stringify(data));
   console.log('Data stored in local storage:', localStorage.getItem('convivial_profiler_builder'));
+  
+  // Update the textarea with the stored content
+  updateTextareaContent();
   
   // Remove the "config" query parameter from the URL
   removeConfigUrlParameter();
