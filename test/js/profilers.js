@@ -63,7 +63,7 @@
           params.set(name, value);
           const newUrl = currentUrl.toString();
           logMessage(`Query parameter ${name} added, reloading page to ${newUrl}`, 'info');
-          parent.postMessage({ action: 'getLocalStorage', key: 'convivial_profiler_builder' }, '*');
+          // No need to request localStorage here - iframe will request it after reload
           iframe.location.href = newUrl;
         } else {
           logMessage(`The query parameter: ${name} already exists.`, 'warning');
@@ -81,6 +81,17 @@
     */
   const executeProfilers = () => {
     try {
+      // Check if convivialProfiler exists and has the collect method
+      if (!window.convivialProfiler) {
+        logMessage('ConvivialProfiler is not initialized. Please ensure valid profiler configuration exists.', 'error');
+        return;
+      }
+      
+      if (typeof window.convivialProfiler.collect !== 'function') {
+        logMessage('ConvivialProfiler.collect is not a function. Please check the profiler initialization.', 'error');
+        return;
+      }
+      
       window.convivialProfiler.collect();
       logMessage('The profilers have run successfully.', 'success');
       deleteAllCookies();
@@ -208,45 +219,62 @@
   // Requesting localStorage data from parent window to initialize the profiler.
   window.testBuilder.onConfigReady = () => {
     const config = window.testBuilder.convivialProfiler;
-    if (config && Object.keys(config).length > 0) {
-      window.convivialProfiler = new ConvivialProfiler(config.config, config.site, config.license_key);
+    
+    // Check if we have valid config with required properties
+    if (config && config.config && config.site && config.license_key) {
+      try {
+        window.convivialProfiler = new ConvivialProfiler(config.config, config.site, config.license_key);
+        console.log('ConvivialProfiler initialized successfully');
+      } catch (error) {
+        console.error('Failed to initialize ConvivialProfiler:', error);
+        window.convivialProfiler = null;
+      }
+    } else {
+      console.log('Invalid or incomplete profiler configuration');
+      window.convivialProfiler = null;
     }
   };
-  })(window, window.ConvivialProfiler.default);
-
+  
   // Auto-execute profilers on page load if valid config exists
   document.addEventListener('DOMContentLoaded', () => {
-  // Small delay to ensure everything is initialized
-  setTimeout(() => {
-    // Check if we have valid profiler configuration
-    const rawData = localStorage.getItem('convivial_profiler_builder');
-    if (!rawData || rawData === 'undefined' || rawData === 'null' || rawData === '{}') {
-      console.log('No valid profiler data for auto-execution');
-      return;
-    }
-    
-    let config;
-    try {
-      config = JSON.parse(rawData);
-    } catch (error) {
-      console.warn('Invalid JSON data, skipping auto-execution');
-      return;
-    }
-    
-    // Check if config has profilers
-    if (!config.config || !config.config.profilers || Object.keys(config.config.profilers).length === 0) {
-      console.log('No profilers configured, skipping auto-execution');
-      return;
-    }
-    
-    // Check if ConvivialProfiler is initialized
-    if (!window.convivialProfiler) {
-      console.log('ConvivialProfiler not initialized, skipping auto-execution');
-      return;
-    }
-    
-    // Everything looks good, execute profilers
-    console.log('Auto-executing profilers on page load');
-    executeProfilers();
-  }, 500); // 500ms delay to ensure iframe communication is complete
-});
+    // Small delay to ensure everything is initialized
+    setTimeout(() => {
+      // Check if we have valid profiler configuration
+      const rawData = localStorage.getItem('convivial_profiler_builder');
+      if (!rawData || rawData === 'undefined' || rawData === 'null' || rawData === '{}') {
+        console.log('No valid profiler data for auto-execution');
+        return;
+      }
+      
+      let config;
+      try {
+        config = JSON.parse(rawData);
+      } catch (error) {
+        console.warn('Invalid JSON data, skipping auto-execution');
+        return;
+      }
+      
+      // Check if config has profilers
+      if (!config.config || !config.config.profilers || Object.keys(config.config.profilers).length === 0) {
+        console.log('No profilers configured, skipping auto-execution');
+        return;
+      }
+      
+      // Check if ConvivialProfiler is initialized
+      if (!window.convivialProfiler) {
+        console.log('ConvivialProfiler not initialized, skipping auto-execution');
+        return;
+      }
+      
+      // Check if collect method exists
+      if (typeof window.convivialProfiler.collect !== 'function') {
+        console.log('ConvivialProfiler.collect is not a function, skipping auto-execution');
+        return;
+      }
+      
+      // Everything looks good, execute profilers
+      console.log('Auto-executing profilers on page load');
+      executeProfilers();
+    }, 500); // 500ms delay to ensure iframe communication is complete
+  });
+  })(window, window.ConvivialProfiler.default);
