@@ -20,5 +20,10 @@ function setupEventListeners() {
   document.getElementById('addColumnBtn').addEventListener('click', addColumn);
   document.getElementById('addProfiler').addEventListener('click', addProfiler);
   document.getElementById('clearProfilersData').addEventListener('click', clearProfilersData);
+  
+  // Update textarea content when export-import tab is shown
+  $('#export-import-tab').on('shown.bs.tab', function() {
+    updateTextareaContent();
+  });
 }
 

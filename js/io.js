@@ -3,22 +3,43 @@
  * Reloads the page to reflect changes.
  */
 const importJSON = () => {
-  // Retrieve JSON string from textarea
-  const jsonContent = document.getElementById('jsonContent').value || '{}';
-  console.log('Importing JSON:', jsonContent);
-  // Parse the JSON string to an object
-  const data = JSON.parse(jsonContent);
-  
-  console.log('Parsed JSON data:', data);
-  // Store the parsed object into local storage
-  localStorage.setItem('convivial_profiler_builder', JSON.stringify(data));
-  console.log('Data stored in local storage:', localStorage.getItem('convivial_profiler_builder'));
-  
-  // Remove the "config" query parameter from the URL
-  removeConfigUrlParameter();
-  
-  // Reload the page to reflect changes
-  location.reload();
+  try {
+    // Retrieve JSON string from textarea
+    const jsonContent = document.getElementById('jsonContent').value;
+    
+    if (!jsonContent || jsonContent.trim() === '') {
+      swal({
+        title: "Error",
+        text: "Please provide valid JSON content to import",
+        icon: "error",
+        button: "OK",
+      });
+      return;
+    }
+    
+    console.log('Importing JSON:', jsonContent);
+    // Parse the JSON string to an object
+    const data = JSON.parse(jsonContent);
+    
+    console.log('Parsed JSON data:', data);
+    // Store the parsed object into local storage
+    localStorage.setItem('convivial_profiler_builder', JSON.stringify(data));
+    console.log('Data stored in local storage:', localStorage.getItem('convivial_profiler_builder'));
+    
+    // Remove the "config" query parameter from the URL
+    removeConfigUrlParameter();
+    
+    // Reload the page to reflect changes
+    location.reload();
+  } catch (error) {
+    console.error('Error importing JSON:', error);
+    swal({
+      title: "Import Error",
+      text: "Invalid JSON format. Please check your JSON and try again.",
+      icon: "error",
+      button: "OK",
+    });
+  }
 };
 
 /**

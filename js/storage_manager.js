@@ -1,4 +1,22 @@
 /**
+ * Safely parses JSON from localStorage with proper error handling
+ * @param {string} key - The localStorage key
+ * @returns {Object} - Parsed object or empty object on error
+ */
+const safeParseLocalStorage = (key) => {
+  try {
+    const data = localStorage.getItem(key);
+    if (!data || data === 'undefined' || data === 'null') {
+      return {};
+    }
+    return JSON.parse(data);
+  } catch (error) {
+    console.warn('Error parsing localStorage data:', error);
+    return {};
+  }
+};
+
+/**
  * Saves or updates the profiler data.
  * @param {number} rowNum - The row number of the profiler.
  */
@@ -50,7 +68,7 @@ const removeProfiler = (rowNum) => {
 
   const machineName = row.querySelector('input[name="machine_name"]').value;
   if (machineName) {
-    let convivialProfilerBuilder = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+    let convivialProfilerBuilder = safeParseLocalStorage('convivial_profiler_builder');
     if (convivialProfilerBuilder.config && convivialProfilerBuilder.config.profilers) {
       delete convivialProfilerBuilder.config.profilers[machineName];
       localStorage.setItem('convivial_profiler_builder', JSON.stringify(convivialProfilerBuilder));
@@ -131,7 +149,7 @@ const extractProfilerData = (row) => {
  * @param {Object} commonFields - An object containing the common field values.
  */
 const saveCommonFields = (commonFields) => {
-  let convivialProfilerBuilder = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  let convivialProfilerBuilder = safeParseLocalStorage('convivial_profiler_builder');
   convivialProfilerBuilder.site = commonFields.siteId;
   convivialProfilerBuilder.license_key = commonFields.licenseKey;
   convivialProfilerBuilder.client_cleanup = commonFields.clientCleanup;
@@ -144,7 +162,7 @@ const saveCommonFields = (commonFields) => {
  * @param {Object} dynamicDataFields - An object containing the dynamic data field values.
  */
 const saveDynamicDataFields = (dynamicDataFields) => {
-  let convivialProfilerBuilder = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  let convivialProfilerBuilder = safeParseLocalStorage('convivial_profiler_builder');
   convivialProfilerBuilder.config = convivialProfilerBuilder.config || {};
   convivialProfilerBuilder.config.data = dynamicDataFields;
   localStorage.setItem('convivial_profiler_builder', JSON.stringify(convivialProfilerBuilder));
@@ -155,7 +173,7 @@ const saveDynamicDataFields = (dynamicDataFields) => {
  * @param {Object} profilerData - An object containing the profiler data.
  */
 const saveProfilerData = (profilerData) => {
-  let convivialProfilerBuilder = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  let convivialProfilerBuilder = safeParseLocalStorage('convivial_profiler_builder');
   convivialProfilerBuilder.config = convivialProfilerBuilder.config || {};
   convivialProfilerBuilder.config.profilers = convivialProfilerBuilder.config.profilers || {};
   convivialProfilerBuilder.config.profilers[profilerData.name] = profilerData;
@@ -184,7 +202,7 @@ const saveProfilerData = (profilerData) => {
  * Populates the profiler forms from data stored in local storage.
  */
  const populateProfilersFromLocalStorage = () => {
-  const convivialProfilerBuilder = JSON.parse(localStorage.getItem('convivial_profiler_builder')) || {};
+  const convivialProfilerBuilder = safeParseLocalStorage('convivial_profiler_builder');
   Object.keys(convivialProfilerBuilder).forEach(profilerKey => {
     const profiler = convivialProfilerBuilder[profilerKey];
     // Call addProfilerForm for each profiler in local storage
